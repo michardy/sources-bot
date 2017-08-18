@@ -31,13 +31,13 @@ Opinions:
 $opinions
 
 __________
-To report a source or opinion article that is not relevant reply "Irrelevant <source or opinion> and the number
+Usage tips and other information may be found [here](https://michardy.github.io/sources-bot/)
 
-Note on opinions: due to sourcing and how articles are matched the opinions may not be terrribly diverse.  
+Note on opinions: due to sourcing and how articles are matched the opinions may not be terribly diverse.  
 
 This bot was written by $writer and the source code can be found [here]($code)
 
-To rant about how biased this bot is go [here](#)'''
+To rant about how biased this bot is go [here](https://michardy.github.io/sources-bot/rant/)'''
 
 def read_words(n, key, r):
 	name = ''
@@ -214,4 +214,4 @@ for s in reddit.subreddit('test').hot(limit = 10):
 		stories = process(title)
 		temp = Template(TEMPLATE)
 		sources = template_links(stories)
-		s.reply(temp.substitute(sources=sources, opinions='- Not Yet\n', writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))
+		s.reply(temp.substitute(sources=sources, opinions='- Not implimented yet\n', writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))
