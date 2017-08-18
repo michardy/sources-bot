@@ -1,6 +1,9 @@
 # Natural Language Toolkit: code_traverse
 # add collection into list for back searching
-import nltk, time
+import nltk
+
+import datetime
+
 try:
 	import urllib2
 except ImportError:
@@ -10,7 +13,7 @@ from urllib.parse import urljoin
 
 import praw
 
-from news import SITES
+from news import SITES, Source
 
 from bs4 import BeautifulSoup
 
@@ -38,6 +41,38 @@ Note on opinions: due to sourcing and how articles are matched the opinions may 
 This bot was written by $writer and the source code can be found [here]($code)
 
 To rant about how biased this bot is go [here](https://michardy.github.io/sources-bot/rant/)'''
+
+class AlJazeera(Source):
+	def update(self):
+		self._time = datetime.datetime.utcnow()
+		r = urllib2.urlopen("http://www.aljazeera.com/")
+		html = r.read()
+		soup = BeautifulSoup(html, "html.parser")
+		self._content = soup.find_all('a')
+
+class Bbc(Source):
+	def update(self):
+		self._time = datetime.datetime.utcnow()
+		r = urllib2.urlopen("http://www.bbc.com/news")
+		html = r.read()
+		soup = BeautifulSoup(html, "html.parser")
+		self._content = soup.find_all('a', {'class':'gs-c-promo-heading'})
+
+class Guardian(Source):
+	def update(self):
+		self._time = datetime.datetime.utcnow()
+		r = urllib2.urlopen("https://www.theguardian.com")
+		html = r.read()
+		soup = BeautifulSoup(html, "html.parser")
+		self._content = soup.find_all('a', {'class':'js-headline-text'})
+
+class Wapo(Source):
+	def update(self):
+		self._time = datetime.datetime.utcnow()
+		r = urllib2.urlopen("http://www.washingtonpost.com")
+		html = r.read()
+		soup = BeautifulSoup(html, "html.parser")
+		self._content = soup.find_all('a', {'data-pb-field':'web_headline'})
 
 def read_words(n, key, r):
 	name = ''
@@ -72,31 +107,6 @@ def uin(cp):
 	story = tagger.tag(story)
 	return(cp.parse(story))
 
-def get_aljazeera():
-	r = urllib2.urlopen("http://www.aljazeera.com/")
-	html = r.read()
-	soup = BeautifulSoup(html, "html.parser")
-	return(soup.find_all('a'))
-
-
-def get_bbc():
-	r = urllib2.urlopen("http://www.bbc.com/news")
-	html = r.read()
-	soup = BeautifulSoup(html, "html.parser")
-	return(soup.find_all('a', {'class':'gs-c-promo-heading'}))
-
-def get_guardian():
-	r = urllib2.urlopen("https://www.theguardian.com")
-	html = r.read()
-	soup = BeautifulSoup(html, "html.parser")
-	return(soup.find_all('a', {'class':'js-headline-text'}))
-
-def get_wapo():
-	r = urllib2.urlopen("http://www.washingtonpost.com")
-	html = r.read()
-	soup = BeautifulSoup(html, "html.parser")
-	return(soup.find_all('a', {'data-pb-field':'web_headline'}))
-
 def strip(s):
 	s = s.lower()
 	if s.endswith('ed'):
@@ -115,15 +125,16 @@ def calc_overlap(title, s, cp):
 			overlap += i in s[k]
 	return(overlap)
 
-class story:
+class Story:
 	def __init__(self, title, url, score, opinion=False):
 		self.title = title
 		self.url = url
 		self.score = score
 		self.opinion = opinion
 
-def score_stories(s, wc, cp, source):
+def score_stories(s, wc, cp, source, source_url):
 	stories = []
+	opinions = []
 	for h in wc:
 		try:
 			if source == 'http://www.bbc.com/news':
@@ -163,28 +174,50 @@ def score_stories(s, wc, cp, source):
 				url = h['href']
 				if url.startswith('/'):
 					url = urljoin(source, url)
-				stories.append({'title':title, 'url':url, 'score': o})
+				if url == source_url:
+					pass
+				if '/opinion/' in url or '/opinions/' in url or '/blogs/' in url:
+					opinions.append({'title':title, 'url':url, 'score': o})
+				else:
+					stories.append({'title':title, 'url':url, 'score': o})
 			#t += list(h.children)[0].contents[0]
 		except AttributeError:
 			pass
-	return(stories)
+	return(stories, opinions)
 
-def process(title):
+def title_clean(title):
+	title = title.replace('‘', "'")
+	title = title.replace('’', "'")
+	title = title.replace('“', '"')
+	title = title.replace('”', '"')
+	return(title)
+
+def process(title, sources, url):
+	title = title_clean(title)
 	stories = []
+	opinions = []
 	s = nltk.word_tokenize(title)
 	s = tagger.tag(s)
 	s = cp.parse(s)
 	# The default r NEEDS to be passed or the function below becomes possessed
 	s = get_characteristics(s, {'places':[], 'people':[], 'organizations':[], 'things':[], 'actions':[]})
-	wp = get_wapo()
-	stories += (score_stories(s, wp, cp, 'https://washingtonpost.com'))
-	bbc = get_bbc()
-	stories += score_stories(s, bbc, cp, 'http://www.bbc.com/news')
-	guard = get_guardian()
-	stories += score_stories(s, bbc, cp, 'https://www.theguardian.com')
-	aljazeera = get_aljazeera()
-	stories += score_stories(s, aljazeera, cp, 'http://www.aljazeera.com/')
-	return(stories)
+	wp = sources['wapo'].get()
+	out = score_stories(s, wp, cp, 'https://washingtonpost.com', url)
+	stories += out[0]
+	opinions += out[1]
+	bbc = sources['bbc'].get()
+	out = score_stories(s, bbc, cp, 'http://www.bbc.com/news', url)
+	stories += out[0]
+	opinions += out[1]
+	guard = sources['guardian'].get()
+	out = score_stories(s, bbc, cp, 'https://www.theguardian.com', url)
+	stories += out[0]
+	opinions += out[1]
+	aljazeera = sources['aljazeera'].get()
+	out = score_stories(s, aljazeera, cp, 'http://www.aljazeera.com/', url)
+	stories += out[0]
+	opinions += out[1]
+	return(stories, opinions)
 
 def test_in_sites(url):
 	for s in SITES:
@@ -201,7 +234,10 @@ def template_links(stories):
 			urls.append(s['url'])
 	return(out)
 
-for s in reddit.subreddit('test').hot(limit = 10):
+sources = {'aljazeera':AlJazeera(), 'bbc':Bbc(), 'guardian':Guardian(), 'wapo':Wapo()}
+for k in sources:
+	sources[k].update()
+for s in reddit.subreddit('news').hot(limit = 10):
 	if test_in_sites(s.url):
 		with urllib2.urlopen(s.url) as p:
 			html = p.read()
@@ -211,7 +247,9 @@ for s in reddit.subreddit('test').hot(limit = 10):
 			title = title.split('|')[0]
 		elif ' - ' in title:
 			title = title.split(' - ')[0]
-		stories = process(title)
+		stories, opinions = process(title, sources, s.url)
 		temp = Template(TEMPLATE)
-		sources = template_links(stories)
-		s.reply(temp.substitute(sources=sources, opinions='- Not implimented yet\n', writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))
+		articles = template_links(stories)
+		editorials = template_links(opinions)
+		if articles:
+			s.reply(temp.substitute(sources=articles, opinions='- Not implimented yet\n', writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))

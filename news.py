@@ -1,3 +1,5 @@
+import datetime
+
 # News sites I respond to (Sites in this list may not nessisarily be reliable)
 # Note: I (the bot) only speak english so this list may be limited
 SITES = [
@@ -61,3 +63,18 @@ SOURCES = [
 	'pbs.org/newshour',
 	'washingtonpost.com'
 ]
+
+class Source:
+	def __init__(self):
+		self._time = None
+		self._content = None
+
+	def get(self):
+		refresh = datetime.timedelta(minutes=30)
+		if datetime.datetime.utcnow() - self._time > refresh:
+			print('UPDATING!')
+			self.update()
+		return(self._content)
+	
+	def update(self):
+		raise NotImplementedError("Must override update")
