@@ -34,13 +34,12 @@ Opinions:
 $opinions
 
 __________
-Usage tips and other information may be found [here](https://michardy.github.io/sources-bot/)
 
 Note on opinions: due to sourcing and how articles are matched the opinions may not be terribly diverse.  
 
-This bot was written by $writer and the source code can be found [here]($code)
+This bot was written by $writer and the source code can be found [here]($code).  
 
-To rant about how biased this bot is go [here](https://michardy.github.io/sources-bot/rant/)'''
+This bot is still very much in beta.  Feedback is is welcome.  '''
 
 class AlJazeera(Source):
 	def update(self):
@@ -186,7 +185,7 @@ def score_stories(s, wc, cp, source, source_url):
 					url = urljoin(source, url)
 				if url == source_url:
 					pass
-				if '/opinion/' in url or '/opinions/' in url or '/blogs/' in url:
+				if '/opinion/' in url or '/opinions/' in url or '/blogs/' in url or '/commentisfree/' in url:
 					opinions.append({'title':title, 'url':url, 'score': o})
 				else:
 					stories.append({'title':title, 'url':url, 'score': o})

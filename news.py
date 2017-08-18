@@ -3,6 +3,7 @@ import datetime
 # News sites I respond to (Sites in this list may not nessisarily be reliable)
 # Note: I (the bot) only speak english so this list may be limited
 SITES = [
+	'abcactionnews.com/news', # Some kind of affilate
 	'abcnews.go.com', # ABC news (Disney subdomain)
 	'aljazeera.com',
 	'hosted.ap.org/dynamic/stories', # Associated press site A
