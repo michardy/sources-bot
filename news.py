@@ -78,3 +78,15 @@ class Source:
 	
 	def update(self):
 		raise NotImplementedError("Must override update")
+
+ENTITIES = {
+	'white':['house'],
+	'paul':['ryan'],
+	'mitch':['mcconell'],
+	'nancy':['pelosi'],
+	'donald':['trump'],
+	'democratic':['party'],
+	'republican':['party'],
+	'president':['trump','donald trump'],
+	'speaker':['ryan','pual ryan']
+}

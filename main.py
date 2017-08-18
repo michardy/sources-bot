@@ -13,7 +13,7 @@ from urllib.parse import urljoin
 
 import praw
 
-from news import SITES, Source
+from news import SITES, ENTITIES, Source
 
 from bs4 import BeautifulSoup
 
@@ -114,15 +114,25 @@ def strip(s):
 	elif s.endswith('es'):
 		return(s[:len(s)-2])
 
+def dedup_entities(entities):
+	for t in entities:
+		for e in range(len(entities[t])-1):
+			if entities[t][e].lower() in ENTITIES and e+1 < len(entities):
+				if entities[t][e+1].lower() in ENTITIES[entities[t][e].lower()]:
+					entities[t][e] += ' '+entities[t][e+1]
+					del entities[t][e+1]
+	return(entities)
+
 def calc_overlap(title, s, cp):
 	story = nltk.word_tokenize(title)
 	story = cp.parse(tagger.tag(story))
 	# The default r NEEDS to be passed or the function below becomes possessed
 	new = get_characteristics(story, {'places':[], 'people':[], 'organizations':[], 'things':[], 'actions':[]})
+	new = dedup_entities(new)
 	overlap = 0
 	for k in new.keys():
 		for i in new[k]:
-			overlap += i in s[k]
+			overlap += i in s[k] and len(i) > 2
 	return(overlap)
 
 class Story:
@@ -201,6 +211,7 @@ def process(title, sources, url):
 	s = cp.parse(s)
 	# The default r NEEDS to be passed or the function below becomes possessed
 	s = get_characteristics(s, {'places':[], 'people':[], 'organizations':[], 'things':[], 'actions':[]})
+	s = dedup_entities(s)
 	wp = sources['wapo'].get()
 	out = score_stories(s, wp, cp, 'https://washingtonpost.com', url)
 	stories += out[0]
@@ -210,7 +221,7 @@ def process(title, sources, url):
 	stories += out[0]
 	opinions += out[1]
 	guard = sources['guardian'].get()
-	out = score_stories(s, bbc, cp, 'https://www.theguardian.com', url)
+	out = score_stories(s, guard, cp, 'https://www.theguardian.com', url)
 	stories += out[0]
 	opinions += out[1]
 	aljazeera = sources['aljazeera'].get()
@@ -237,7 +248,7 @@ def template_links(stories):
 sources = {'aljazeera':AlJazeera(), 'bbc':Bbc(), 'guardian':Guardian(), 'wapo':Wapo()}
 for k in sources:
 	sources[k].update()
-for s in reddit.subreddit('news').hot(limit = 10):
+for s in reddit.subreddit('news').hot(limit = 70):
 	if test_in_sites(s.url):
 		with urllib2.urlopen(s.url) as p:
 			html = p.read()
@@ -252,4 +263,8 @@ for s in reddit.subreddit('news').hot(limit = 10):
 		articles = template_links(stories)
 		editorials = template_links(opinions)
 		if articles or editorials:
-			s.reply(temp.substitute(sources=articles, opinions=editorials, writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))
+			#s.reply(temp.substitute(sources=articles, opinions=editorials, writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))
+			print(title)
+			print(articles)
+			print(editorials)
+			#print(temp.substitute(sources=articles, opinions=editorials, writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))
