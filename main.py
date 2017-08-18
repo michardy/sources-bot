@@ -6,13 +6,11 @@ try:
 except ImportError:
 	import urllib.request as urllib2
 
-from nltk.corpus import wordnet as wn
-
 from urllib.parse import urljoin
 
 import praw
 
-from news import SITES, SOURCES
+from news import SITES
 
 from bs4 import BeautifulSoup
 
