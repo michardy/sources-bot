@@ -263,8 +263,4 @@ for s in reddit.subreddit('news').hot(limit = 70):
 		articles = template_links(stories)
 		editorials = template_links(opinions)
 		if articles or editorials:
-			#s.reply(temp.substitute(sources=articles, opinions=editorials, writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))
-			print(title)
-			print(articles)
-			print(editorials)
-			#print(temp.substitute(sources=articles, opinions=editorials, writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))
+			s.reply(temp.substitute(sources=articles, opinions=editorials, writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))
