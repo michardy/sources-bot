@@ -71,12 +71,17 @@ SOURCES = [
 
 ENTITIES = {
 	'white':['house'],
+	'house':['speaker'],
 	'paul':['ryan'],
 	'mitch':['mcconell'],
 	'nancy':['pelosi'],
 	'donald':['trump'],
 	'democratic':['party'],
 	'republican':['party'],
-	'president':['trump','donald trump'],
-	'speaker':['ryan','pual ryan']
+	'president':['trump','donald'],
+	'president donald':['trump'],
+	'speaker':['ryan','pual'],
+	'speaker pual':['ryan'],
+	'house speaker':['ryan','pual'],
+	'house speaker paul':['ryan']
 }
