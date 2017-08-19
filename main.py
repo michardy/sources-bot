@@ -4,6 +4,7 @@ import nltk
 import datetime
 try:
 	import urllib2
+	from urlparse import urljoin
 except ImportError:
 	import urllib.request as urllib2
 	from urllib.parse import urljoin
