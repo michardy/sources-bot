@@ -314,6 +314,8 @@ def dedup_entities(entities):
 				if entities[t][e+1].lower() in ENTITIES[entities[t][e].lower()]:
 					entities[t][e] += ' '+entities[t][e+1]
 					del entities[t][e+1]
+				else:
+					break
 			e += 1
 	return(entities)
 
@@ -393,7 +395,7 @@ sources = {
 }
 for k in sources:
 	k.update()
-for s in reddit.subreddit('test').hot(limit = 3):
+for s in reddit.subreddit('news').hot(limit = 3):
 	if test_in_sites(s.url):
 		with urllib2.urlopen(s.url) as p:
 			html = p.read()
@@ -410,8 +412,4 @@ for s in reddit.subreddit('test').hot(limit = 3):
 		articles = template_links(stories)
 		editorials = template_links(opinions)
 		if articles or editorials:
-			print()
-			print(title)
-			print(temp.substitute(sources=articles, opinions=editorials, writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))
-			#time.sleep(10)
 			s.reply(temp.substitute(sources=articles, opinions=editorials, writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))
