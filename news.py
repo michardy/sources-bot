@@ -15,6 +15,7 @@ SITES = [
 	'theblaze.com',
 	'bloomberg.com/news',
 	'breitbart.com',
+	'cbslocal.com', # * CBS local affiliates
 	'cbsnews.com',
 	'english.cctv.com', # China Central Telivision
 	'news.cgtn.com', # China Global Television Network
@@ -40,6 +41,7 @@ SITES = [
 	'reuters.com',
 	'www.rt.com', # Russia Today (www. is the English subdomain)
 	'sabc.co.za/news', # South African Broadcasting Corporation
+	'news.sky.com',
 	'slate.com',
 	'thesun.co.uk/news',
 	'usatoday.com/story/news',
@@ -58,7 +60,7 @@ SOURCES = [
 	'bbc.com/news',
 	'spiegel.de/international',
 	'theguardian.com',
-	'haaretz.com,'
+#	'haaretz.com,' Can't use paywalled
 	'thehill.com',
 #	'npr.org', # Can't use due to force capitalized titles
 #	'nytimes.com', # Can't use due to force capitalized titles
