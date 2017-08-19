@@ -114,9 +114,18 @@ class AlJazeera(Source):
 				pass
 			machine_title = nltk.word_tokenize(title)
 			machine_title = cp.parse(tagger.tag(machine_title))
+			thresh = 1
+			if desc:
+				thresh = 2
 			desc = nltk.word_tokenize(desc)
 			desc = cp.parse(tagger.tag(desc))
-			self._content.append({'title':title, 'machine_title':machine_title, 'description':desc, 'url':url})
+			self._content.append({
+				'title':title,
+				'machine_title':machine_title,
+				'description':desc,
+				'threshold':thresh,
+				'url':url
+			})
 
 	def update(self):
 		self._time = datetime.datetime.utcnow()
@@ -132,7 +141,7 @@ class Bbc(Source):
 		self._content = []
 		for h in links:
 			desc = ''
-			if not  str(h.contents[0].contents[0]).startswith('<'):
+			if not str(h.contents[0].contents[0]).startswith('<'):
 				title = h.contents[0].contents[0]
 				if len(h.parent.contents) > 1:
 					desc = h.parent.contents[1].contents[0]
@@ -143,9 +152,18 @@ class Bbc(Source):
 				url = urljoin('http://www.bbc.com/news', url)
 			machine_title = nltk.word_tokenize(title)
 			machine_title = cp.parse(tagger.tag(machine_title))
+			thresh = 1
+			if desc:
+				thresh = 2
 			desc = nltk.word_tokenize(desc)
 			desc = cp.parse(tagger.tag(desc))
-			self._content.append({'title':title, 'machine_title':machine_title, 'description':desc, 'url':url})
+			self._content.append({
+				'title':title,
+				'machine_title':machine_title,
+				'description':desc,
+				'threshold':thresh,
+				'url':url
+			})
 
 	def update(self):
 		self._time = datetime.datetime.utcnow()
@@ -173,9 +191,18 @@ class Guardian(Source):
 				url = urljoin('https://www.theguardian.com', url)
 			machine_title = nltk.word_tokenize(title)
 			machine_title = cp.parse(tagger.tag(machine_title))
+			thresh = 1
+			if desc:
+				thresh = 2
 			desc = nltk.word_tokenize(desc)
 			desc = cp.parse(tagger.tag(desc))
-			self._content.append({'title':title, 'machine_title':machine_title, 'description':desc, 'url':url})
+			self._content.append({
+				'title':title,
+				'machine_title':machine_title,
+				'description':desc,
+				'threshold':thresh,
+				'url':url
+			})
 
 	def update(self):
 		self._time = datetime.datetime.utcnow()
@@ -183,6 +210,51 @@ class Guardian(Source):
 		html = r.read()
 		soup = BeautifulSoup(html, "html.parser")
 		links = soup.find_all('a', {'class':'js-headline-text'})
+		self.__isolate_content(links)
+		self._characterize()
+
+class Hill(Source):
+	def __isolate_content(self, links):
+		self._content = []
+		for h in links:
+			desc = ''
+			title = ''
+			try:
+				if 'menu__link' not in h['class'] and 'hide_overlay' not in h['class']:
+					if not h['class'][0].startswith('social-share-'):
+						try:
+							title = h.contents[0]
+						except IndexError:
+							pass
+			except KeyError:
+				try:
+					title = h.contents[0]
+				except IndexError:
+					pass
+			url = h['href']
+			if url.startswith('/'):
+				url = urljoin('http://thehill.com/', url)
+			machine_title = nltk.word_tokenize(title)
+			machine_title = cp.parse(tagger.tag(machine_title))
+			thresh = 1
+			if desc:
+				thresh = 2
+			desc = nltk.word_tokenize(desc)
+			desc = cp.parse(tagger.tag(desc))
+			self._content.append({
+				'title':title,
+				'machine_title':machine_title,
+				'description':desc,
+				'threshold':thresh,
+				'url':url
+			})
+
+	def update(self):
+		self._time = datetime.datetime.utcnow()
+		r = urllib2.urlopen("http://thehill.com/")
+		html = r.read()
+		soup = BeautifulSoup(html, "html.parser")
+		links = soup.find_all('a')
 		self.__isolate_content(links)
 		self._characterize()
 
@@ -199,9 +271,18 @@ class Wapo(Source):
 				url = urljoin('http://www.washingtonpost.com', url)
 			machine_title = nltk.word_tokenize(title)
 			machine_title = cp.parse(tagger.tag(machine_title))
+			thresh = 1
+			if desc:
+				thresh = 2
 			desc = nltk.word_tokenize(desc)
 			desc = cp.parse(tagger.tag(desc))
-			self._content.append({'title':title, 'machine_title':machine_title, 'description':desc, 'url':url})
+			self._content.append({
+				'title':title,
+				'machine_title':machine_title,
+				'description':desc,
+				'threshold':thresh,
+				'url':url
+			})
 
 	def update(self):
 		self._time = datetime.datetime.utcnow()
@@ -255,7 +336,8 @@ def score_stories(s, wc, cp, source_url):
 	opinions = []
 	for h in wc:
 		o = calc_overlap(h['character'], s, cp)
-		if o > 1:
+		thresh = h['threshold']
+		if o > thresh:
 			url = h['url']
 			if '/opinion/' in url or '/opinions/' in url or '/blogs/' in url or '/commentisfree/' in url or '/posteverything/' in url:
 				opinions.append({'title':h['title'], 'url':url, 'score': o})
@@ -274,28 +356,17 @@ def process(title, sources, url):
 	title = title_clean(title)
 	stories = []
 	opinions = []
-	s = nltk.word_tokenize(title)
-	s = tagger.tag(s)
-	s = cp.parse(s)
+	t = nltk.word_tokenize(title)
+	t = tagger.tag(t)
+	t = cp.parse(t)
 	# The default r NEEDS to be passed or the function below becomes possessed
-	s = get_characteristics(s, {'places':[], 'people':[], 'organizations':[], 'things':[], 'actions':[]})
-	s = dedup_entities(s)
-	wp = sources['wapo'].get()
-	out = score_stories(s, wp, cp, url)
-	stories += out[0]
-	opinions += out[1]
-	bbc = sources['bbc'].get()
-	out = score_stories(s, bbc, cp, url)
-	stories += out[0]
-	opinions += out[1]
-	guard = sources['guardian'].get()
-	out = score_stories(s, guard, cp, url)
-	stories += out[0]
-	opinions += out[1]
-	aljazeera = sources['aljazeera'].get()
-	out = score_stories(s, aljazeera, cp, url)
-	stories += out[0]
-	opinions += out[1]
+	t = get_characteristics(t, {'places':[], 'people':[], 'organizations':[], 'things':[], 'actions':[]})
+	t = dedup_entities(t)
+	for s in sources:
+		res = s.get()
+		out = score_stories(t, res, cp, url)
+		stories += out[0]
+		opinions += out[1]
 	return(stories, opinions)
 
 def test_in_sites(url):
@@ -313,10 +384,16 @@ def template_links(stories):
 			urls.append(s['url'])
 	return(out)
 
-sources = {'aljazeera':AlJazeera(), 'bbc':Bbc(), 'guardian':Guardian(), 'wapo':Wapo()}
+sources = {
+	AlJazeera(),
+	Bbc(),
+	Guardian(),
+	Hill(),
+	Wapo()
+}
 for k in sources:
-	sources[k].update()
-for s in reddit.subreddit('worldnews').hot(limit = 3):
+	k.update()
+for s in reddit.subreddit('test').hot(limit = 3):
 	if test_in_sites(s.url):
 		with urllib2.urlopen(s.url) as p:
 			html = p.read()
@@ -326,6 +403,8 @@ for s in reddit.subreddit('worldnews').hot(limit = 3):
 			title = title.split('|')[0]
 		elif ' - ' in title:
 			title = title.split(' - ')[0]
+		elif '«' in title:
+			title = title.split('«')[0]
 		stories, opinions = process(title, sources, s.url)
 		temp = Template(TEMPLATE)
 		articles = template_links(stories)
@@ -335,4 +414,4 @@ for s in reddit.subreddit('worldnews').hot(limit = 3):
 			print(title)
 			print(temp.substitute(sources=articles, opinions=editorials, writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))
 			#time.sleep(10)
-			#s.reply(temp.substitute(sources=articles, opinions=editorials, writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))
+			s.reply(temp.substitute(sources=articles, opinions=editorials, writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))
