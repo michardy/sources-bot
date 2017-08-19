@@ -6,6 +6,7 @@ SITES = [
 	'abcactionnews.com/news', # Some kind of affilate
 	'abcnews.go.com', # ABC news (Disney subdomain)
 	'aljazeera.com',
+	'ahtribune.com', # "News" also a disturbing combination of hearsay, xenophobia, and bigotry (Probably run by the Assad regime)
 	'hosted.ap.org/dynamic/stories', # Associated press site A
 	'apnews.com', # Associated press site B (An AJAX catastrophe)
 	'aol.com/article/news', # Surprisingly not dead yet
