@@ -41,6 +41,7 @@ SITES = [
 	'www.rt.com', # Russia Today (www. is the English subdomain)
 	'sabc.co.za/news', # South African Broadcasting Corporation
 	'slate.com',
+	'thesun.co.uk/news',
 	'usatoday.com/story/news',
 	'voanews.com', # Voice of America
 	'vox.com',
@@ -64,21 +65,6 @@ SOURCES = [
 	'pbs.org/newshour',
 	'washingtonpost.com'
 ]
-
-class Source:
-	def __init__(self):
-		self._time = None
-		self._content = None
-
-	def get(self):
-		refresh = datetime.timedelta(minutes=30)
-		if datetime.datetime.utcnow() - self._time > refresh:
-			print('UPDATING!')
-			self.update()
-		return(self._content)
-	
-	def update(self):
-		raise NotImplementedError("Must override update")
 
 ENTITIES = {
 	'white':['house'],

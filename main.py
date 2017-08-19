@@ -1,29 +1,22 @@
 # Natural Language Toolkit: code_traverse
 # add collection into list for back searching
 import nltk
-
 import datetime
-
 try:
 	import urllib2
 except ImportError:
 	import urllib.request as urllib2
-
-from urllib.parse import urljoin
-
+	from urllib.parse import urljoin
 import praw
-
-from news import SITES, ENTITIES, Source
-
 from bs4 import BeautifulSoup
-
 from string import Template
+from news import SITES, ENTITIES
 
 cp = nltk.data.load('chunkers/maxent_ne_chunker/english_ace_multiclass.pickle')
 
 tagger = nltk.data.load('taggers/maxent_treebank_pos_tagger/english.pickle')
 
-reddit = praw.Reddit('sourcesbot', user_agent='web:sourcesbot by /u/michaelh115')
+reddit = praw.Reddit('sourcesbot', user_agent='web:sourcesbot:v0.0.1 by /u/michaelh115')
 
 TEMPLATE = '''Other sources for this story:
 
@@ -41,44 +34,13 @@ This bot was written by $writer and the source code can be found [here]($code).
 
 This bot is still very much in beta.  Feedback is is welcome.  '''
 
-class AlJazeera(Source):
-	def update(self):
-		self._time = datetime.datetime.utcnow()
-		r = urllib2.urlopen("http://www.aljazeera.com/")
-		html = r.read()
-		soup = BeautifulSoup(html, "html.parser")
-		self._content = soup.find_all('a')
-
-class Bbc(Source):
-	def update(self):
-		self._time = datetime.datetime.utcnow()
-		r = urllib2.urlopen("http://www.bbc.com/news")
-		html = r.read()
-		soup = BeautifulSoup(html, "html.parser")
-		self._content = soup.find_all('a', {'class':'gs-c-promo-heading'})
-
-class Guardian(Source):
-	def update(self):
-		self._time = datetime.datetime.utcnow()
-		r = urllib2.urlopen("https://www.theguardian.com")
-		html = r.read()
-		soup = BeautifulSoup(html, "html.parser")
-		self._content = soup.find_all('a', {'class':'js-headline-text'})
-
-class Wapo(Source):
-	def update(self):
-		self._time = datetime.datetime.utcnow()
-		r = urllib2.urlopen("http://www.washingtonpost.com")
-		html = r.read()
-		soup = BeautifulSoup(html, "html.parser")
-		self._content = soup.find_all('a', {'data-pb-field':'web_headline'})
-
 def read_words(n, key, r):
 	name = ''
 	for l in n.leaves():
 		name += l[0] + ' '
 	name = name[:len(name)-1]
-	r[key].append(name)
+	if name not in r[key]:
+		r[key].append(name)
 	return(r)
 
 def get_characteristics(t, r):
@@ -95,10 +57,159 @@ def get_characteristics(t, r):
 		else:
 			if len(n) == 2:
 				if n[1].startswith('N'):
-					r['things'].append(n[0].lower())
+					if n[0].lower() not in r['things']:
+						r['things'].append(n[0].lower())
 				elif n[1].startswith('V'):
-					r['actions'].append(n[0].lower())
+					if n[0].lower() not in r['actions']:
+						r['actions'].append(n[0].lower())
 	return(r)
+
+class Source:
+	def __init__(self):
+		self._time = None
+		self._content = None
+
+	def get(self):
+		refresh = datetime.timedelta(minutes=30)
+		if datetime.datetime.utcnow() - self._time > refresh:
+			self.update()
+		return(self._content)
+
+	def update(self):
+		raise NotImplementedError("Must override update")
+
+	def _characterize(self):
+		for s in range(len(self._content)):
+			# The default r NEEDS to be passed or the function below becomes possessed
+			c = get_characteristics(
+				self._content[s]['machine_title'],
+				{'places':[], 'people':[], 'organizations':[], 'things':[], 'actions':[]}
+			)
+			c = get_characteristics(self._content[s]['description'], c)
+			c = dedup_entities(c)
+			self._content[s]['character'] = c
+
+class AlJazeera(Source):
+	def __isolate_content(self, links):
+		self._content = []
+		for h in links:
+			desc, title = '', ''
+			try:
+				if str(h.contents[0]).startswith('<'):
+					if not str(h.contents[0].contents[0]).startswith('<'):
+						title = h.contents[0].contents[0]
+						try:
+							if 'top-sec-desc' in h.parent.contents[3]['class']:
+								desc = h.parent.contents[3].contents[0]
+						except KeyError:
+							pass
+			except IndexError: # malformed HTML
+				pass
+			try:
+				url = h['href']
+				if url.startswith('/'):
+					url = urljoin('http://www.aljazeera.com/', url)
+			except KeyError: # Yes, here at Al Jazeera we use empty <a> tags!
+				pass
+			machine_title = nltk.word_tokenize(title)
+			machine_title = cp.parse(tagger.tag(machine_title))
+			desc = nltk.word_tokenize(desc)
+			desc = cp.parse(tagger.tag(desc))
+			self._content.append({'title':title, 'machine_title':machine_title, 'description':desc, 'url':url})
+
+	def update(self):
+		self._time = datetime.datetime.utcnow()
+		r = urllib2.urlopen("http://www.aljazeera.com/")
+		html = r.read()
+		soup = BeautifulSoup(html, "html.parser")
+		links = soup.find_all('a')
+		self.__isolate_content(links)
+		self._characterize()
+
+class Bbc(Source):
+	def __isolate_content(self, links):
+		self._content = []
+		for h in links:
+			desc = ''
+			if not  str(h.contents[0].contents[0]).startswith('<'):
+				title = h.contents[0].contents[0]
+				if len(h.parent.contents) > 1:
+					desc = h.parent.contents[1].contents[0]
+			else:
+				title = h.contents[1].contents[0]
+			url = h['href']
+			if url.startswith('/'):
+				url = urljoin('http://www.bbc.com/news', url)
+			machine_title = nltk.word_tokenize(title)
+			machine_title = cp.parse(tagger.tag(machine_title))
+			desc = nltk.word_tokenize(desc)
+			desc = cp.parse(tagger.tag(desc))
+			self._content.append({'title':title, 'machine_title':machine_title, 'description':desc, 'url':url})
+
+	def update(self):
+		self._time = datetime.datetime.utcnow()
+		r = urllib2.urlopen("http://www.bbc.com/news")
+		html = r.read()
+		soup = BeautifulSoup(html, "html.parser")
+		links = soup.find_all('a', {'class':'gs-c-promo-heading'})
+		self.__isolate_content(links)
+		self._characterize()
+
+class Guardian(Source):
+	def __isolate_content(self, links):
+		self._content = []
+		for h in links:
+			desc = ''
+			try:
+				title = h.contents[0]
+			except TypeError:
+				if str(h.contents[0].contents[0]).startswith('<'):
+					title = h.contents[1].contents[0]
+				else:
+					title = h.contents[0].contents[0]
+			url = h['href']
+			if url.startswith('/'):
+				url = urljoin('https://www.theguardian.com', url)
+			machine_title = nltk.word_tokenize(title)
+			machine_title = cp.parse(tagger.tag(machine_title))
+			desc = nltk.word_tokenize(desc)
+			desc = cp.parse(tagger.tag(desc))
+			self._content.append({'title':title, 'machine_title':machine_title, 'description':desc, 'url':url})
+
+	def update(self):
+		self._time = datetime.datetime.utcnow()
+		r = urllib2.urlopen("https://www.theguardian.com")
+		html = r.read()
+		soup = BeautifulSoup(html, "html.parser")
+		links = soup.find_all('a', {'class':'js-headline-text'})
+		self.__isolate_content(links)
+		self._characterize()
+
+class Wapo(Source):
+	def __isolate_content(self, links):
+		self._content = []
+		for h in links:
+			desc = ''
+			title = h.contents[0]
+			if 'blurb' in h.parent.parent.contents[1]['class']:
+				desc = h.parent.parent.contents[1].contents[0]
+			url = h['href']
+			if url.startswith('/'):
+				url = urljoin('http://www.washingtonpost.com', url)
+			machine_title = nltk.word_tokenize(title)
+			machine_title = cp.parse(tagger.tag(machine_title))
+			desc = nltk.word_tokenize(desc)
+			desc = cp.parse(tagger.tag(desc))
+			self._content.append({'title':title, 'machine_title':machine_title, 'description':desc, 'url':url})
+
+	def update(self):
+		self._time = datetime.datetime.utcnow()
+		r = urllib2.urlopen("http://www.washingtonpost.com")
+		html = r.read()
+		soup = BeautifulSoup(html, "html.parser")
+		links = soup.find_all('a', {'data-pb-field':'web_headline'})
+		self.__isolate_content(links)
+		self._characterize()
 
 def uin(cp):
 	s = input('story: ')
@@ -115,22 +226,19 @@ def strip(s):
 
 def dedup_entities(entities):
 	for t in entities:
-		for e in range(len(entities[t])-1):
-			if entities[t][e].lower() in ENTITIES and e+1 < len(entities):
+		e = 0
+		while e < len(entities[t])-1:
+			if entities[t][e].lower() in ENTITIES:
 				if entities[t][e+1].lower() in ENTITIES[entities[t][e].lower()]:
 					entities[t][e] += ' '+entities[t][e+1]
 					del entities[t][e+1]
+			e += 1
 	return(entities)
 
 def calc_overlap(title, s, cp):
-	story = nltk.word_tokenize(title)
-	story = cp.parse(tagger.tag(story))
-	# The default r NEEDS to be passed or the function below becomes possessed
-	new = get_characteristics(story, {'places':[], 'people':[], 'organizations':[], 'things':[], 'actions':[]})
-	new = dedup_entities(new)
 	overlap = 0
-	for k in new.keys():
-		for i in new[k]:
+	for k in title.keys():
+		for i in title[k]:
 			overlap += i in s[k] and len(i) > 2
 	return(overlap)
 
@@ -141,57 +249,17 @@ class Story:
 		self.score = score
 		self.opinion = opinion
 
-def score_stories(s, wc, cp, source, source_url):
+def score_stories(s, wc, cp, source_url):
 	stories = []
 	opinions = []
 	for h in wc:
-		try:
-			if source == 'http://www.bbc.com/news':
-				try:
-					o = calc_overlap(h.contents[0].contents[0], s, cp)
-					title = h.contents[0].contents[0]
-				except TypeError:
-					o = calc_overlap(h.contents[1].contents[0], s, cp)
-					title = h.contents[1].contents[0]
-			elif source == 'https://www.theguardian.com':
-				try:
-					o = calc_overlap(h.contents[0], s, cp)
-					title = h.contents[0]
-				except TypeError:
-					if str(h.contents[0].contents[0]).startswith('<'):
-						o = calc_overlap(h.contents[1].contents[0], s, cp)
-						title = h.contents[1].contents[0]
-					else:
-						o = calc_overlap(h.contents[0].contents[0], s, cp)
-						title = h.contents[0].contents[0]
-			elif source == 'http://www.aljazeera.com/':
-				try:
-					if str(h.contents[0]).startswith('<'):
-						try:
-							o = calc_overlap(h.contents[0].contents[0], s, cp)
-							title = h.contents[0].contents[0]
-						except TypeError:
-							o = 0
-					else:
-						o = 0
-				except IndexError: # malformed HTML
-					o = 0
-			else:
-				o = calc_overlap(h.contents[0], s, cp)
-				title = h.contents[0]
-			if o > 1:
-				url = h['href']
-				if url.startswith('/'):
-					url = urljoin(source, url)
-				if url == source_url:
-					pass
-				if '/opinion/' in url or '/opinions/' in url or '/blogs/' in url or '/commentisfree/' in url:
-					opinions.append({'title':title, 'url':url, 'score': o})
-				else:
-					stories.append({'title':title, 'url':url, 'score': o})
-			#t += list(h.children)[0].contents[0]
-		except AttributeError:
-			pass
+		o = calc_overlap(h['character'], s, cp)
+		if o > 1:
+			url = h['url']
+			if '/opinion/' in url or '/opinions/' in url or '/blogs/' in url or '/commentisfree/' in url or '/posteverything/' in url:
+				opinions.append({'title':h['title'], 'url':url, 'score': o})
+			elif url != source_url:
+				stories.append({'title':h['title'], 'url':url, 'score': o})
 	return(stories, opinions)
 
 def title_clean(title):
@@ -212,19 +280,19 @@ def process(title, sources, url):
 	s = get_characteristics(s, {'places':[], 'people':[], 'organizations':[], 'things':[], 'actions':[]})
 	s = dedup_entities(s)
 	wp = sources['wapo'].get()
-	out = score_stories(s, wp, cp, 'https://washingtonpost.com', url)
+	out = score_stories(s, wp, cp, url)
 	stories += out[0]
 	opinions += out[1]
 	bbc = sources['bbc'].get()
-	out = score_stories(s, bbc, cp, 'http://www.bbc.com/news', url)
+	out = score_stories(s, bbc, cp, url)
 	stories += out[0]
 	opinions += out[1]
 	guard = sources['guardian'].get()
-	out = score_stories(s, guard, cp, 'https://www.theguardian.com', url)
+	out = score_stories(s, guard, cp, url)
 	stories += out[0]
 	opinions += out[1]
 	aljazeera = sources['aljazeera'].get()
-	out = score_stories(s, aljazeera, cp, 'http://www.aljazeera.com/', url)
+	out = score_stories(s, aljazeera, cp, url)
 	stories += out[0]
 	opinions += out[1]
 	return(stories, opinions)
@@ -247,7 +315,7 @@ def template_links(stories):
 sources = {'aljazeera':AlJazeera(), 'bbc':Bbc(), 'guardian':Guardian(), 'wapo':Wapo()}
 for k in sources:
 	sources[k].update()
-for s in reddit.subreddit('news').hot(limit = 70):
+for s in reddit.subreddit('worldnews').hot(limit = 3):
 	if test_in_sites(s.url):
 		with urllib2.urlopen(s.url) as p:
 			html = p.read()
@@ -262,4 +330,8 @@ for s in reddit.subreddit('news').hot(limit = 70):
 		articles = template_links(stories)
 		editorials = template_links(opinions)
 		if articles or editorials:
-			s.reply(temp.substitute(sources=articles, opinions=editorials, writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))
+			print()
+			print(title)
+			print(temp.substitute(sources=articles, opinions=editorials, writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))
+			#time.sleep(10)
+			#s.reply(temp.substitute(sources=articles, opinions=editorials, writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))
