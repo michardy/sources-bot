@@ -310,7 +310,7 @@ def dedup_entities(entities):
 	for t in entities:
 		e = 0
 		while e < len(entities[t])-1:
-			if entities[t][e].lower() in ENTITIES:
+			while entities[t][e].lower() in ENTITIES:
 				if entities[t][e+1].lower() in ENTITIES[entities[t][e].lower()]:
 					entities[t][e] += ' '+entities[t][e+1]
 					del entities[t][e+1]
