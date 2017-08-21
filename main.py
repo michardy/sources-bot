@@ -11,7 +11,7 @@ except ImportError:
 import praw
 from bs4 import BeautifulSoup
 from string import Template
-from news import SITES, ENTITIES
+from news import SITES, ENTITIES, USELESS_VERBS, POSITIONS
 
 cp = nltk.data.load('chunkers/maxent_ne_chunker/english_ace_multiclass.pickle')
 
@@ -89,7 +89,8 @@ def get_characteristics(t, r):
 					if t[n][0].lower() not in r['talley']['things']:
 						r['talley']['things'].append(t[n][0].lower())
 				elif t[n][1].startswith('V'):
-					if t[n][0].lower() not in r['talley']['actions']:
+					if (t[n][0].lower() not in r['talley']['actions'] and
+						t[n][0].lower() not in USELESS_VERBS):
 						r['talley']['actions'].append(t[n][0].lower())
 				elif t[n][1] == ':':
 					r = find_mandatory_words_end(t, n, r)
@@ -123,7 +124,7 @@ class Source:
 						'actions':[]
 					},
 					'mandate':{
-						'speaker':[]
+						'speakers':[]
 					}
 				}
 			)
@@ -359,6 +360,9 @@ def dedup_entities(entities):
 					del et[t][e+1]
 				else:
 					break
+			if t not in ['things', 'actions'] and et[t][e].lower() in POSITIONS:
+				if POSITIONS[et[t][e].lower()] in et['things']:
+					del et[t][e]
 			e += 1
 	entities['talley'] = et
 	return(entities)
@@ -370,7 +374,9 @@ def calc_overlap(title, s, cp):
 			overlap += i in s['talley'][k] and len(i) > 2
 	for k in title['mandate'].keys():
 		for i in title['mandate'][k]:
-			overlap -= i in s['mandate'][k] and len(i) > 2
+			overlap -= (i in s['mandate'][k] and
+						i in s['talley']['people'] and
+						len(i) > 2)
 	return(overlap)
 
 def score_stories(s, wc, cp, source_url):
@@ -423,7 +429,7 @@ def process(title, sources, url):
 			'actions':[]
 		},
 		'mandate':{
-			'speaker':[]
+			'speakers':[]
 		}
 	})
 	t = dedup_entities(t)
@@ -444,7 +450,7 @@ def template_links(stories):
 	out = ''
 	urls = []
 	n = 0
-	for s in sorted(stories, key=lambda k: k['score']):
+	for s in reversed(sorted(stories, key=lambda k: k['score'])):
 		if s['url'] not in urls:
 			n += 1
 			out += f'{str(n)}. [{s["title"]}]({s["url"]})\n'

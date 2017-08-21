@@ -46,6 +46,7 @@ SITES = [
 	'sabc.co.za/news', # South African Broadcasting Corporation
 	'news.sky.com',
 	'slate.com',
+	'thestar.com/news',
 	'thestar.com.my/news',
 	'thesun.co.uk/news',
 	'telegraph.co.uk/news',
@@ -90,3 +91,12 @@ ENTITIES = {
 	'house speaker':['ryan','pual'],
 	'house speaker paul':['ryan']
 }
+
+POSITIONS = {
+	'trump':'president'
+}
+
+USELESS_VERBS = [
+	'has',
+	'is'
+]
