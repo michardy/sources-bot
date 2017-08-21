@@ -84,7 +84,13 @@ class Source:
 			# The default r NEEDS to be passed or the function below becomes possessed
 			c = get_characteristics(
 				self._content[s]['machine_title'],
-				{'places':[], 'people':[], 'organizations':[], 'things':[], 'actions':[]}
+				{
+					'places':[],
+					'people':[],
+					'organizations':[],
+					'things':[],
+					'actions':[]
+				}
 			)
 			c = get_characteristics(self._content[s]['description'], c)
 			c = dedup_entities(c)
@@ -220,7 +226,8 @@ class Hill(Source):
 			desc = ''
 			title = ''
 			try:
-				if 'menu__link' not in h['class'] and 'hide_overlay' not in h['class']:
+				if ('menu__link' not in h['class'] and 
+					'hide_overlay' not in h['class']):
 					if not h['class'][0].startswith('social-share-'):
 						try:
 							title = h.contents[0]
@@ -341,10 +348,22 @@ def score_stories(s, wc, cp, source_url):
 		thresh = h['threshold']
 		if o > thresh:
 			url = h['url']
-			if '/opinion/' in url or '/opinions/' in url or '/blogs/' in url or '/commentisfree/' in url or '/posteverything/' in url:
-				opinions.append({'title':h['title'], 'url':url, 'score': o})
+			if ('/opinion/' in url or
+				'/opinions/' in url or
+				'/blogs/' in url or
+				'/commentisfree/' in url or
+				'/posteverything/' in url):
+				opinions.append({
+					'title':h['title'],
+					'url':url,
+					'score': o
+				})
 			elif url != source_url:
-				stories.append({'title':h['title'], 'url':url, 'score': o})
+				stories.append({
+					'title':h['title'],
+					'url':url,
+					'score': o
+				})
 	return(stories, opinions)
 
 def title_clean(title):
@@ -362,7 +381,13 @@ def process(title, sources, url):
 	t = tagger.tag(t)
 	t = cp.parse(t)
 	# The default r NEEDS to be passed or the function below becomes possessed
-	t = get_characteristics(t, {'places':[], 'people':[], 'organizations':[], 'things':[], 'actions':[]})
+	t = get_characteristics(t, {
+		'places':[],
+		'people':[],
+		'organizations':[],
+		'things':[],
+		'actions':[]
+	})
 	t = dedup_entities(t)
 	for s in sources:
 		res = s.get()
@@ -412,4 +437,11 @@ for s in reddit.subreddit('news').hot(limit = 3):
 		articles = template_links(stories)
 		editorials = template_links(opinions)
 		if articles or editorials:
-			s.reply(temp.substitute(sources=articles, opinions=editorials, writer='/u/michaelh115', code='https://github.com/michardy/sources-bot'))
+			s.reply(
+				temp.substitute(
+					sources=articles,
+					opinions=editorials,
+					writer='/u/michaelh115',
+					code='https://github.com/michardy/sources-bot'
+				)
+			)
