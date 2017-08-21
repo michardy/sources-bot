@@ -16,6 +16,8 @@ SITES = [
 	'theblaze.com',
 	'bloomberg.com/news',
 	'breitbart.com',
+	'businessinsider.com',
+	'cbc.ca/news', # Canadian Broadcasting Service
 	'cbslocal.com', # * CBS local affiliates
 	'cbsnews.com',
 	'english.cctv.com', # China Central Telivision
@@ -44,7 +46,10 @@ SITES = [
 	'sabc.co.za/news', # South African Broadcasting Corporation
 	'news.sky.com',
 	'slate.com',
+	'thestar.com.my/news',
 	'thesun.co.uk/news',
+	'telegraph.co.uk/news',
+	'unian.info', # Ukrainian Independent Information Agency of News
 	'usatoday.com/story/news',
 	'voanews.com', # Voice of America
 	'vox.com',
