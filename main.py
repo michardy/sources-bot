@@ -428,9 +428,11 @@ def test_in_sites(url):
 def template_links(stories):
 	out = ''
 	urls = []
+	n = 0
 	for s in sorted(stories, key=lambda k: k['score']):
 		if s['url'] not in urls:
-			out += f'- [{s["title"]}]({s["url"]})\n'
+			n += 1
+			out += f'{str(n)}. [{s["title"]}]({s["url"]})\n'
 			urls.append(s['url'])
 	return(out)
 
