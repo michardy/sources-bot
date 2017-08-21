@@ -35,39 +35,39 @@ This bot was written by $writer and the source code can be found [here]($code).
 
 This bot is still very much in beta.  [Feedback is is welcome.](https://www.reddit.com/r/sourcesbot/comments/6v0pa5/feedback/)  '''
 
-def read_words(n, key, r):
+def read_words(n, key, subk, r):
 	name = ''
 	for l in n.leaves():
 		name += l[0] + ' '
 	name = name[:len(name)-1]
-	if name not in r[key]:
-		r[key].append(name)
+	if name not in r[key][subk]:
+		r[key][subk].append(name)
 	return(r)
 
 def find_mandatory_words_start(t, n, r):
 	if n == 0: # start end
 		if len(t) > 2 and len(t[n+1]) == 2:
 			if t[n+1][1] == ':': # <Name>:
-				r = read_words(t[n], 'speakers', r)
+				r = read_words(t[n], 'mandate', 'speakers', r)
 		elif len(t) > 4 and len(t[n+1]) == 2:
 			if (t[n+1][1] == 'CC' and
 				t[n+3].label() == 'PERSON' and
 				t[n+4].label() == ':'): # <Name> and <Name>:
-				r = read_words(t[n], 'speakers', r)
-				r = read_words(t[n+3], 'speakers', r)
+				r = read_words(t[n], 'mandate', 'speakers', r)
+				r = read_words(t[n+3], 'mandate', 'speakers', r)
 	return(r)
 
 def find_mandatory_words_end(t, n, r):
 	if n == len(t) - 1:
 		if len(t)-n > 2:
 			if t[n+1].label() == 'PERSON': # <Name>:
-				r = read_words(t[n+1], 'speakers', r)
+				r = read_words(t[n+1], 'mandate', 'speakers', r)
 		elif len(t)-n > 4:
 			if (t[n+1].label() == 'PERSON' and
 				t[n+3][1] == 'CC' and
 				t[n+4].label() == 'PERSON'): # <Name> and <Name>:
-				r = read_words(t[n+1], 'speakers', r)
-				r = read_words(t[n+4], 'speakers', r)
+				r = read_words(t[n+1], 'mandate', 'speakers', r)
+				r = read_words(t[n+4], 'mandate', 'speakers', r)
 	return(r)
 
 def get_characteristics(t, r):
@@ -75,22 +75,22 @@ def get_characteristics(t, r):
 	for n in range(len(t)):
 		if type(t[n]) == nltk.tree.Tree:
 			if t[n].label() == 'GPE':
-				r = read_words(t[n], 'places', r)
+				r = read_words(t[n], 'talley', 'places', r)
 			elif t[n].label() == 'ORGANIZATION':
-				r = read_words(t[n], 'organizations', r)
+				r = read_words(t[n], 'talley', 'organizations', r)
 			elif t[n].label() == 'PERSON':
 				r = find_mandatory_words_start(t, n, r)
-				r = read_words(t[n], 'people', r)
+				r = read_words(t[n], 'talley', 'people', r)
 			else:
 				get_characteristics(t[n], r)
 		else:
 			if len(t[n]) == 2:
 				if t[n][1].startswith('N'):
-					if t[n][0].lower() not in r['things']:
-						r['things'].append(t[n][0].lower())
+					if t[n][0].lower() not in r['talley']['things']:
+						r['talley']['things'].append(t[n][0].lower())
 				elif t[n][1].startswith('V'):
-					if t[n][0].lower() not in r['actions']:
-						r['actions'].append(t[n][0].lower())
+					if t[n][0].lower() not in r['talley']['actions']:
+						r['talley']['actions'].append(t[n][0].lower())
 				elif t[n][1] == ':':
 					r = find_mandatory_words_end(t, n, r)
 	return(r)
@@ -115,11 +115,16 @@ class Source:
 			c = get_characteristics(
 				self._content[s]['machine_title'],
 				{
-					'places':[],
-					'people':[],
-					'organizations':[],
-					'things':[],
-					'actions':[]
+					'talley':{
+						'places':[],
+						'people':[],
+						'organizations':[],
+						'things':[],
+						'actions':[]
+					},
+					'mandate':{
+						'speaker'
+					}
 				}
 			)
 			c = get_characteristics(self._content[s]['description'], c)
@@ -344,23 +349,28 @@ def strip(s):
 		return(s[:len(s)-2])
 
 def dedup_entities(entities):
-	for t in entities:
+	et = entities['talley']
+	for t in et:
 		e = 0
-		while e < len(entities[t])-1:
-			while entities[t][e].lower() in ENTITIES:
-				if entities[t][e+1].lower() in ENTITIES[entities[t][e].lower()]:
-					entities[t][e] += ' '+entities[t][e+1]
-					del entities[t][e+1]
+		while e < len(et[t])-1:
+			while et[t][e].lower() in ENTITIES:
+				if et[t][e+1].lower() in ENTITIES[et[t][e].lower()]:
+					et[t][e] += ' '+et[t][e+1]
+					del et[t][e+1]
 				else:
 					break
 			e += 1
+	entities['talley'] = et
 	return(entities)
 
 def calc_overlap(title, s, cp):
 	overlap = 0
-	for k in title.keys():
-		for i in title[k]:
-			overlap += i in s[k] and len(i) > 2
+	for k in title['talley'].keys():
+		for i in title['talley'][k]:
+			overlap += i in s['talley'][k] and len(i) > 2
+	for k in title['mandate'].keys():
+		for i in title['mandate'][k]:
+			overlap -= i in s['mandate'][k] and len(i) > 2
 	return(overlap)
 
 def score_stories(s, wc, cp, source_url):
@@ -405,11 +415,16 @@ def process(title, sources, url):
 	t = cp.parse(t)
 	# The default r NEEDS to be passed or the function below becomes possessed
 	t = get_characteristics(t, {
-		'places':[],
-		'people':[],
-		'organizations':[],
-		'things':[],
-		'actions':[]
+		'talley':{
+			'places':[],
+			'people':[],
+			'organizations':[],
+			'things':[],
+			'actions':[]
+		},
+		'mandate':{
+			'speaker'
+		}
 	})
 	t = dedup_entities(t)
 	for s in sources:
