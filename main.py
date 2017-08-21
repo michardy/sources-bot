@@ -33,7 +33,7 @@ Note on opinions: due to sourcing and how articles are matched the opinions may 
 
 This bot was written by $writer and the source code can be found [here]($code).  
 
-This bot is still very much in beta.  Feedback is is welcome.  '''
+This bot is still very much in beta.  [Feedback is is welcome.](https://www.reddit.com/r/sourcesbot/comments/6v0pa5/feedback/)  '''
 
 def read_words(n, key, r):
 	name = ''
@@ -44,25 +44,55 @@ def read_words(n, key, r):
 		r[key].append(name)
 	return(r)
 
+def find_mandatory_words_start(t, n, r):
+	if n == 0: # start end
+		if len(t) > 2 and len(t[n+1]) == 2:
+			if t[n+1][1] == ':': # <Name>:
+				r = read_words(t[n], 'speakers', r)
+		elif len(t) > 4 and len(t[n+1]) == 2:
+			if (t[n+1][1] == 'CC' and
+				t[n+3].label() == 'PERSON' and
+				t[n+4].label() == ':'): # <Name> and <Name>:
+				r = read_words(t[n], 'speakers', r)
+				r = read_words(t[n+3], 'speakers', r)
+	return(r)
+
+def find_mandatory_words_end(t, n, r):
+	if n == len(t) - 1:
+		if len(t)-n > 2:
+			if t[n+1].label() == 'PERSON': # <Name>:
+				r = read_words(t[n+1], 'speakers', r)
+		elif len(t)-n > 4:
+			if (t[n+1].label() == 'PERSON' and
+				t[n+3][1] == 'CC' and
+				t[n+4].label() == 'PERSON'): # <Name> and <Name>:
+				r = read_words(t[n+1], 'speakers', r)
+				r = read_words(t[n+4], 'speakers', r)
+	return(r)
+
 def get_characteristics(t, r):
-	for n in t:
-		if type(n) == nltk.tree.Tree:
-			if n.label() == 'GPE':
-				r = read_words(n, 'places', r)
-			elif n.label() == 'ORGANIZATION':
-				r = read_words(n, 'organizations', r)
-			elif n.label() == 'PERSON':
-				r = read_words(n, 'people', r)
+	# Get people, places, organizations, actions and other things of signifigance
+	for n in range(len(t)):
+		if type(t[n]) == nltk.tree.Tree:
+			if t[n].label() == 'GPE':
+				r = read_words(t[n], 'places', r)
+			elif t[n].label() == 'ORGANIZATION':
+				r = read_words(t[n], 'organizations', r)
+			elif t[n].label() == 'PERSON':
+				r = find_mandatory_words_start(t, n, r)
+				r = read_words(t[n], 'people', r)
 			else:
-				get_characteristics(n, r)
+				get_characteristics(t[n], r)
 		else:
-			if len(n) == 2:
-				if n[1].startswith('N'):
-					if n[0].lower() not in r['things']:
-						r['things'].append(n[0].lower())
-				elif n[1].startswith('V'):
-					if n[0].lower() not in r['actions']:
-						r['actions'].append(n[0].lower())
+			if len(t[n]) == 2:
+				if t[n][1].startswith('N'):
+					if t[n][0].lower() not in r['things']:
+						r['things'].append(t[n][0].lower())
+				elif t[n][1].startswith('V'):
+					if t[n][0].lower() not in r['actions']:
+						r['actions'].append(t[n][0].lower())
+				elif t[n][1] == ':':
+					r = find_mandatory_words_end(t, n, r)
 	return(r)
 
 class Source:
