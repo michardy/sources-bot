@@ -123,7 +123,7 @@ class Source:
 						'actions':[]
 					},
 					'mandate':{
-						'speaker'
+						'speaker':[]
 					}
 				}
 			)
@@ -423,7 +423,7 @@ def process(title, sources, url):
 			'actions':[]
 		},
 		'mandate':{
-			'speaker'
+			'speaker':[]
 		}
 	})
 	t = dedup_entities(t)
