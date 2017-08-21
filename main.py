@@ -333,13 +333,6 @@ def calc_overlap(title, s, cp):
 			overlap += i in s[k] and len(i) > 2
 	return(overlap)
 
-class Story:
-	def __init__(self, title, url, score, opinion=False):
-		self.title = title
-		self.url = url
-		self.score = score
-		self.opinion = opinion
-
 def score_stories(s, wc, cp, source_url):
 	stories = []
 	opinions = []
