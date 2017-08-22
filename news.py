@@ -22,6 +22,7 @@ SITES = [
 	'cbsnews.com',
 	'english.cctv.com', # China Central Telivision
 	'news.cgtn.com', # China Global Television Network
+	'chron.com/news',
 	'cnn.com',
 	'spiegel.de/international', # Der Spiegel hopefully english version
 	'foxnews.com',

@@ -41,7 +41,7 @@ def read_words(n, key, subk, r):
 		name += l[0] + ' '
 	name = name[:len(name)-1]
 	if name not in r[key][subk]:
-		r[key][subk].append(name)
+		r[key][subk].append(name.lower())
 	return(r)
 
 def find_mandatory_words_start(t, n, r):
@@ -471,7 +471,10 @@ for s in reddit.subreddit('news').hot(limit = 3):
 		with urllib2.urlopen(s.url) as p:
 			html = p.read()
 		soup = BeautifulSoup(html, "html.parser")
-		title = soup.find_all('title')[0].contents[0]
+		try:
+			title = soup.find_all('title')[0].contents[0]
+		except IndexError: # untitled site
+			title = ''
 		if '|' in title:
 			title = title.split('|')[0]
 		elif ' - ' in title:
