@@ -156,9 +156,9 @@ class AlJazeera(Source):
 				pass
 			machine_title = nltk.word_tokenize(title)
 			machine_title = cp.parse(tagger.tag(machine_title))
-			thresh = 1
+			thresh = 2
 			if desc:
-				thresh = 2
+				thresh = 3
 			desc = nltk.word_tokenize(desc)
 			desc = cp.parse(tagger.tag(desc))
 			self._content.append({
@@ -194,9 +194,9 @@ class Bbc(Source):
 				url = urljoin('http://www.bbc.com/news', url)
 			machine_title = nltk.word_tokenize(title)
 			machine_title = cp.parse(tagger.tag(machine_title))
-			thresh = 1
+			thresh = 2
 			if desc:
-				thresh = 2
+				thresh = 3
 			desc = nltk.word_tokenize(desc)
 			desc = cp.parse(tagger.tag(desc))
 			self._content.append({
@@ -233,9 +233,9 @@ class Guardian(Source):
 				url = urljoin('https://www.theguardian.com', url)
 			machine_title = nltk.word_tokenize(title)
 			machine_title = cp.parse(tagger.tag(machine_title))
-			thresh = 1
+			thresh = 2
 			if desc:
-				thresh = 2
+				thresh = 3
 			desc = nltk.word_tokenize(desc)
 			desc = cp.parse(tagger.tag(desc))
 			self._content.append({
@@ -279,9 +279,9 @@ class Hill(Source):
 				url = urljoin('http://thehill.com/', url)
 			machine_title = nltk.word_tokenize(title)
 			machine_title = cp.parse(tagger.tag(machine_title))
-			thresh = 1
+			thresh = 2
 			if desc:
-				thresh = 2
+				thresh = 3
 			desc = nltk.word_tokenize(desc)
 			desc = cp.parse(tagger.tag(desc))
 			self._content.append({
@@ -314,9 +314,9 @@ class Wapo(Source):
 				url = urljoin('http://www.washingtonpost.com', url)
 			machine_title = nltk.word_tokenize(title)
 			machine_title = cp.parse(tagger.tag(machine_title))
-			thresh = 1
+			thresh = 2
 			if desc:
-				thresh = 2
+				thresh = 3
 			desc = nltk.word_tokenize(desc)
 			desc = cp.parse(tagger.tag(desc))
 			self._content.append({
@@ -371,7 +371,10 @@ def calc_overlap(title, s, cp):
 	overlap = 0
 	for k in title['talley'].keys():
 		for i in title['talley'][k]:
-			overlap += i in s['talley'][k] and len(i) > 2
+			if k == 'places':
+				overlap += (i in s['talley'][k] and len(i) > 2)*2
+			else:
+				overlap += i in s['talley'][k] and len(i) > 2
 	for k in title['mandate'].keys():
 		for i in title['mandate'][k]:
 			overlap -= (i in s['mandate'][k] and
