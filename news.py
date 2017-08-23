@@ -62,20 +62,6 @@ SITES = [
 	'yahoo.com/news'
 ]
 
-# News sites I use (I will get banned from /r/the_donald)
-SOURCES = [
-	'aljazeera.com',
-	'bbc.com/news',
-	'spiegel.de/international',
-	'theguardian.com',
-#	'haaretz.com,' Can't use paywalled
-	'thehill.com',
-#	'npr.org', # Can't use due to force capitalized titles
-#	'nytimes.com', # Can't use due to force capitalized titles
-	'pbs.org/newshour',
-	'washingtonpost.com'
-]
-
 ENTITIES = {
 	'white':['house'],
 	'house':['speaker'],
@@ -96,6 +82,10 @@ ENTITIES = {
 POSITIONS = {
 	'trump':'president'
 }
+
+NOT_GPE = [
+	'Trump'
+]
 
 USELESS_VERBS = [
 	'has',
