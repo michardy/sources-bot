@@ -11,7 +11,7 @@ except ImportError:
 import praw
 from bs4 import BeautifulSoup
 from string import Template
-from news import SITES, ENTITIES, USELESS_VERBS, POSITIONS
+from news import *
 
 cp = nltk.data.load('chunkers/maxent_ne_chunker/english_ace_multiclass.pickle')
 
@@ -33,12 +33,13 @@ Note on opinions: due to sourcing and how articles are matched the opinions may 
 
 This bot was written by $writer and the source code can be found [here]($code).  
 
-This bot is still very much in beta.  [Feedback is is welcome.](https://www.reddit.com/r/sourcesbot/comments/6v0pa5/feedback/)  '''
+This bot is still very much in beta.  [Feedback is welcome.](https://www.reddit.com/r/sourcesbot/comments/6v0pa5/feedback/)  '''
 
 def read_words(n, key, subk, r):
 	name = ''
 	for l in n.leaves():
-		name += l[0] + ' '
+		if l[0] not in NOT_GPE:
+			name += l[0] + ' '
 	name = name[:len(name)-1]
 	if name not in r[key][subk]:
 		r[key][subk].append(name.lower())
