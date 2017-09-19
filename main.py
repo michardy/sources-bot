@@ -2,15 +2,17 @@
 # add collection into list for back searching
 import nltk
 import datetime
+import re
+import praw
+from bs4 import BeautifulSoup
+from string import Template
 try:
 	import urllib2
 	from urlparse import urljoin
 except ImportError:
 	import urllib.request as urllib2
 	from urllib.parse import urljoin
-import praw
-from bs4 import BeautifulSoup
-from string import Template
+
 from news import *
 
 cp = nltk.data.load('chunkers/maxent_ne_chunker/english_ace_multiclass.pickle')
@@ -29,17 +31,24 @@ $opinions
 
 __________
 
-Note on opinions: due to sourcing and how articles are matched the opinions may not be terribly diverse.  
+^(*Note on opinions: due to sourcing and how articles are matched the opinions may not be terribly diverse.*)
 
-This bot was written by $writer and the source code can be found [here]($code).  
+^*[feedback](https://www.reddit.com/r/sourcesbot/comments/6v0pa5/feedback/)* ^| ^*[usage](https://www.reddit.com/r/sourcesbot/wiki/index)* ^| ^*[code]($code)* ^| ^*author:* ^*$writer*'''
 
-This bot is still very much in beta.  [Feedback is welcome.](https://www.reddit.com/r/sourcesbot/comments/6v0pa5/feedback/)  '''
+TEMPLATE_NFOUND = '''No acceptable matches were found
+
+__________
+
+^*[feedback](https://www.reddit.com/r/sourcesbot/comments/6v0pa5/feedback/)* ^| ^*[usage](https://www.reddit.com/r/sourcesbot/wiki/index)* ^| ^*[code]($code)* ^| ^*author:* ^*$writer*'''
 
 def read_words(n, key, subk, r):
 	name = ''
 	for l in n.leaves():
 		if l[0] not in NOT_GPE:
 			name += l[0] + ' '
+		else:
+			if l[0] not in r['talley']['people']:
+				r[key][subk].append(l[0].lower())
 	name = name[:len(name)-1]
 	if name not in r[key][subk]:
 		r[key][subk].append(name.lower())
@@ -457,9 +466,25 @@ def template_links(stories):
 	for s in reversed(sorted(stories, key=lambda k: k['score'])):
 		if s['url'] not in urls:
 			n += 1
-			out += f'{str(n)}. [{s["title"]}]({s["url"]})\n'
+			out += f'{str(n)}. [{s["title"]}]({s["url"]}) ({str(s["score"])})\n'
 			urls.append(s['url'])
 	return(out)
+
+def get_story_title(url):
+	with urllib2.urlopen(url) as p:
+		html = p.read()
+	soup = BeautifulSoup(html, "html.parser")
+	try:
+		title = soup.find_all('title')[0].contents[0]
+	except IndexError: # untitled site
+		title = ''
+	if '|' in title:
+		title = title.split('|')[0]
+	elif ' - ' in title:
+		title = title.split(' - ')[0]
+	elif '«' in title:
+		title = title.split('«')[0]
+	return(title)
 
 sources = {
 	AlJazeera(),
@@ -470,21 +495,9 @@ sources = {
 }
 for k in sources:
 	k.update()
-for s in reddit.subreddit('news').hot(limit = 3):
+for s in reddit.subreddit('worldnews').hot(limit = 30):
 	if test_in_sites(s.url):
-		with urllib2.urlopen(s.url) as p:
-			html = p.read()
-		soup = BeautifulSoup(html, "html.parser")
-		try:
-			title = soup.find_all('title')[0].contents[0]
-		except IndexError: # untitled site
-			title = ''
-		if '|' in title:
-			title = title.split('|')[0]
-		elif ' - ' in title:
-			title = title.split(' - ')[0]
-		elif '«' in title:
-			title = title.split('«')[0]
+		title = get_story_title(s.url)
 		stories, opinions = process(title, sources, s.url)
 		temp = Template(TEMPLATE)
 		articles = template_links(stories)
@@ -498,3 +511,42 @@ for s in reddit.subreddit('news').hot(limit = 3):
 					code='https://github.com/michardy/sources-bot'
 				)
 			)
+for mention in reddit.inbox.mentions():
+	b = mention.body
+	urlregex = re.compile(r'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)')
+	if b.startswith('+/u/sourcesbot'):
+		b = b.replace('+/u/sourcesbot ', '')
+		b = b.replace('+/u/sourcesbot', '')
+		if b == '':
+			pass
+			#mention.reply('Error: empty request')
+		else:
+			urls = urlregex.search(b)
+			if urls is not None:
+				q = get_story_title(urls.group(0))
+			else:
+				q = b
+			stories, opinions = process(q, sources, urls.group(0))
+			temp = Template(TEMPLATE)
+			articles = template_links(stories)
+			editorials = template_links(opinions)
+			if articles or editorials:
+				print(q)
+				print(
+					temp.substitute(
+						sources=articles,
+						opinions=editorials,
+						writer='/u/michaelh115',
+						code='https://github.com/michardy/sources-bot'
+					)
+				)
+				mention.reply(
+					temp.substitute(
+						sources=articles,
+						opinions=editorials,
+						writer='/u/michaelh115',
+						code='https://github.com/michardy/sources-bot'
+					)
+				)
+			else:
+				mention.reply('No matching articles were found')
