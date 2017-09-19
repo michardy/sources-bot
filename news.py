@@ -32,6 +32,7 @@ SITES = [
 	'thehill.com',
 	'huffingtonpost.com',
 	'independent.co.uk/news',
+	'miamiherald.com/news',
 	'msnbc.com',
 	'nationalreview.com',
 	'nbcnews.com',
@@ -51,6 +52,7 @@ SITES = [
 	'thestar.com.my/news',
 	'thesun.co.uk/news',
 	'telegraph.co.uk/news',
+	'news.trust.org', # Thomson Reuters
 	'unian.info', # Ukrainian Independent Information Agency of News
 	'usatoday.com/story/news',
 	'voanews.com', # Voice of America
@@ -76,11 +78,27 @@ ENTITIES = {
 	'speaker':['ryan','pual'],
 	'speaker pual':['ryan'],
 	'house speaker':['ryan','pual'],
-	'house speaker paul':['ryan']
+	'house speaker paul':['ryan'],
+	'antonio':['guterres'],
+	'antónio':['guterres'],
+	'un':['head', 'high', 'chief', 'secretary-general', 'secretary', 'secretary- '],
+	'un secretary':['general', 'guterres', 'antonio', 'antónio'],
+	'un secretary antonio': ['guterres'],
+	'un secretary antónio': ['guterres'],
+	'un high':['commissioner'],
 }
 
 POSITIONS = {
-	'trump':'president'
+	'trump':'president',
+	'un secretary':'un secretary general',
+	'un chief':'un secretary general',
+	'un secretary guterres':'un secretary general',
+	'un secretary antonio':'un secretary general',
+	'un secretary antónio':'un secretary general',
+	'un secretary antonio guterres':'un secretary general',
+	'un secretary antónio guterres':'un secretary general',
+	'antonio guterres':'un secretary general',
+	'antónio guterres':'un secretary general',
 }
 
 NOT_GPE = [
