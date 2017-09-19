@@ -83,6 +83,7 @@ ENTITIES = {
 	'antónio':['guterres'],
 	'un':['head', 'high', 'chief', 'secretary-general', 'secretary', 'secretary- '],
 	'un secretary':['general', 'guterres', 'antonio', 'antónio'],
+	'un secretary-':['general', 'guterres', 'antonio', 'antónio'],
 	'un secretary antonio': ['guterres'],
 	'un secretary antónio': ['guterres'],
 	'un high':['commissioner'],
@@ -91,6 +92,7 @@ ENTITIES = {
 POSITIONS = {
 	'trump':'president',
 	'un secretary':'un secretary general',
+	'un secretary- general':'un secretary general',
 	'un chief':'un secretary general',
 	'un secretary guterres':'un secretary general',
 	'un secretary antonio':'un secretary general',
