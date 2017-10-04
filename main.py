@@ -168,7 +168,7 @@ class AlJazeera(Source):
 			machine_title = cp.parse(tagger.tag(machine_title))
 			thresh = 2
 			if desc:
-				thresh = 3
+				thresh += 1
 			desc = nltk.word_tokenize(desc)
 			desc = cp.parse(tagger.tag(desc))
 			self._content.append({
@@ -206,7 +206,7 @@ class Bbc(Source):
 			machine_title = cp.parse(tagger.tag(machine_title))
 			thresh = 2
 			if desc:
-				thresh = 3
+				thresh += 1
 			desc = nltk.word_tokenize(desc)
 			desc = cp.parse(tagger.tag(desc))
 			self._content.append({
@@ -245,7 +245,7 @@ class Guardian(Source):
 			machine_title = cp.parse(tagger.tag(machine_title))
 			thresh = 2
 			if desc:
-				thresh = 3
+				thresh += 1
 			desc = nltk.word_tokenize(desc)
 			desc = cp.parse(tagger.tag(desc))
 			self._content.append({
@@ -291,7 +291,7 @@ class Hill(Source):
 			machine_title = cp.parse(tagger.tag(machine_title))
 			thresh = 2
 			if desc:
-				thresh = 3
+				thresh += 1
 			desc = nltk.word_tokenize(desc)
 			desc = cp.parse(tagger.tag(desc))
 			self._content.append({
@@ -326,7 +326,7 @@ class Wapo(Source):
 			machine_title = cp.parse(tagger.tag(machine_title))
 			thresh = 2
 			if desc:
-				thresh = 3
+				thresh += 1
 			desc = nltk.word_tokenize(desc)
 			desc = cp.parse(tagger.tag(desc))
 			self._content.append({
@@ -392,12 +392,13 @@ def calc_overlap(title, s, cp):
 						len(i) > 2)
 	return(overlap)
 
-def score_stories(s, wc, cp, source_url):
+def score_stories(s, wc, cp, source_url, t_off):
 	stories = []
 	opinions = []
 	for h in wc:
 		o = calc_overlap(h['character'], s, cp)
 		thresh = h['threshold']
+		thresh += t_off
 		if o > thresh:
 			url = h['url']
 			if ('/opinion/' in url or
@@ -429,6 +430,7 @@ def process(title, sources, url):
 	title = title_clean(title)
 	stories = []
 	opinions = []
+	thresh_off = 0
 	t = nltk.word_tokenize(title)
 	t = tagger.tag(t)
 	t = cp.parse(t)
@@ -446,9 +448,11 @@ def process(title, sources, url):
 		}
 	})
 	t = dedup_entities(t)
+	if ':' in title and len(t['mandate']['speakers']) == 0:
+		thresh_off += 1
 	for s in sources:
 		res = s.get()
-		out = score_stories(t, res, cp, url)
+		out = score_stories(t, res, cp, url, thresh_off)
 		stories += out[0]
 		opinions += out[1]
 	return(stories, opinions)
