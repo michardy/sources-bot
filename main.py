@@ -399,19 +399,20 @@ def score_stories(s, wc, cp, source_url, t_off):
 		o = calc_overlap(h['character'], s, cp)
 		thresh = h['threshold']
 		thresh += t_off
-		if o > thresh:
-			url = h['url']
-			if ('/opinion/' in url or
-				'/opinions/' in url or
-				'/blogs/' in url or
-				'/commentisfree/' in url or
-				'/posteverything/' in url):
+		url = h['url']
+		if ('/opinion/' in url or
+			'/opinions/' in url or
+			'/blogs/' in url or
+			'/commentisfree/' in url or
+			'/posteverything/' in url):
+			if o > (thresh - 1):
 				opinions.append({
 					'title':h['title'],
 					'url':url,
 					'score': o
 				})
-			elif url != source_url:
+		elif url != source_url:
+			if o > thresh:
 				stories.append({
 					'title':h['title'],
 					'url':url,
@@ -499,7 +500,7 @@ sources = {
 }
 for k in sources:
 	k.update()
-for s in reddit.subreddit('worldnews').hot(limit = 30):
+for s in reddit.subreddit('news').hot(limit = 30):
 	if test_in_sites(s.url):
 		title = get_story_title(s.url)
 		stories, opinions = process(title, sources, s.url)
@@ -507,7 +508,8 @@ for s in reddit.subreddit('worldnews').hot(limit = 30):
 		articles = template_links(stories)
 		editorials = template_links(opinions)
 		if articles or editorials:
-			s.reply(
+			print(title)
+			print(
 				temp.substitute(
 					sources=articles,
 					opinions=editorials,
@@ -515,6 +517,15 @@ for s in reddit.subreddit('worldnews').hot(limit = 30):
 					code='https://github.com/michardy/sources-bot'
 				)
 			)
+			#s.reply(
+			#	temp.substitute(
+			#		sources=articles,
+			#		opinions=editorials,
+			#		writer='/u/michaelh115',
+			#		code='https://github.com/michardy/sources-bot'
+			#	)
+			#)
+'''
 for mention in reddit.inbox.mentions():
 	b = mention.body
 	urlregex = re.compile(r'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)')
@@ -554,3 +565,4 @@ for mention in reddit.inbox.mentions():
 				)
 			else:
 				mention.reply('No matching articles were found')
+'''
