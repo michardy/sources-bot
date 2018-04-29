@@ -32,6 +32,7 @@ SITES = [
 	'thehill.com',
 	'huffingtonpost.com',
 	'independent.co.uk/news',
+	'infowars.com/news/', # This is so far gone I am not sure this software will even work. (The headlines contain too much opinion to reasonably find alternate sourcing)
 	'miamiherald.com/news',
 	'msnbc.com',
 	'nationalreview.com',
