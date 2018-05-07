@@ -2,9 +2,12 @@ import datetime
 
 # News sites I respond to (Sites in this list may not nessisarily be reliable)
 # Note: I (the bot) only speak english so this list may be limited
+# Note: I don't support the Korean Central News Agency because it is too hard to support
+#	It attempts to be statefull using a statless protocol and thus brakes all hyperlinking
 SITES = [
 	'abcactionnews.com/news', # Some kind of affilate (US local)
 	'abcnews.go.com', # ABC news US broadcaster (Disney subdomain)
+	'english.alarabiya.net/en/News', # Saudi Arabian news channel (State run, Saudi Arabia)
 	'aljazeera.com', # Qatari News Channel (State run, Qatar)
 	'ahtribune.com', # "News" also a disturbing combination of hearsay, xenophobia, and bigotry (Probably run by the Assad regime)
 	'hosted.ap.org/dynamic/stories', # Associated press site A
@@ -25,12 +28,15 @@ SITES = [
 	'chron.com/news',
 	'cnn.com', # US 24h news broadcaster
 	'nation.co.ke', # The Daily Nation (Kenyan newspaper run by Nation Media Group)
+	'dawn.com/', # Pakistani newspaper
 	'spiegel.de/international', # Der Spiegel (German Newspaper) hopefully english version
 	'foxnews.com', # US conseravative news broadcaster
 	'france24.com/en', # French news broadcaster
 	'theguardian.com', # UK newspaper
 	'haaretz.com,' # Israli newspaper
 	'thehill.com', # US political news site
+	'thehindu.com/news', # Indian news site
+	# 'hindustantimes.com', # Indian newspaper (disabled becase link parsing is complicated and I am unprepared to filter out celebrity videos)
 	'huffingtonpost.com', # US liberal news commentary site
 	'independent.co.uk/news', # UK newspaper
 	'infowars.com/news/', # This is so far gone I am not sure this software will even work. (The headlines contain too much opinion to reasonably find alternate sourcing) (US conservative news commentary)
@@ -55,6 +61,9 @@ SITES = [
 	'thestar.com.my/news',
 	'thesun.co.uk/news', # UK tabloid
 	'telegraph.co.uk/news', # UK tabloid
+	'thetimes.co.uk', # UK newspaper
+	'timesofindia.indiatimes.com/', # The Times of India (Indian newspaper)
+	'indiatimes.com/news', # Indian news site (not the same as above or just rebranding)
 	'news.trust.org', # Thomson Reuters (Wire)
 	'unian.info', # Ukrainian Independent Information Agency of News
 	'usatoday.com/story/news', # US newspaper (at least at one point it was)
