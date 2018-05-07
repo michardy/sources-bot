@@ -24,6 +24,7 @@ SITES = [
 	'news.cgtn.com', # China Global Television Network
 	'chron.com/news',
 	'cnn.com',
+	'nation.co.ke', # The Daily Nation (Kenyan newspaper run by Nation Media Group)
 	'spiegel.de/international', # Der Spiegel hopefully english version
 	'foxnews.com',
 	'france24.com/en',
