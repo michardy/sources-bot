@@ -40,10 +40,14 @@ __________
 
 ^*[feedback](https://www.reddit.com/r/sourcesbot/comments/6v0pa5/feedback/)* ^| ^*[usage](https://www.reddit.com/r/sourcesbot/wiki/index)* ^| ^*[code]($code)* ^| ^*author:* ^*$writer*'''
 
-class Snippet
+class Snippet():
+	def __init__(self, token):
+		
 
 class Langtree():
-	def __tree_from_point(point)
+	def __tree_from_point(self, point, tokens):
+		if point == tokens[point].dependency_edge.head_token_index:
+			self._data
 	def from_data(self, annotated):
 		processed = [False for i in annotated.tokens]
 		t = 0 # iterator for scanning flattened tree
@@ -63,7 +67,7 @@ def annotate(text):
 		"extract_document_sentiment":	False,
 		"extract_entity_sentiment":		False,
 	}
-	return(client.annotate_text(document=document, features=features))
+	return(client.annotate_text(document=document, features=features, encoding_type='UTF8'))
 
 def read_words(n, key, subk, r):
 	name = ''
