@@ -1,6 +1,7 @@
-# Natural Language Toolkit: code_traverse
-# add collection into list for back searching
-import nltk
+from google.cloud import language
+from google.cloud.language import enums
+from google.cloud.language import types
+
 import datetime
 import re
 import praw
@@ -15,11 +16,9 @@ except ImportError:
 
 from news import *
 
-cp = nltk.data.load('chunkers/maxent_ne_chunker/english_ace_multiclass.pickle')
+client = language.LanguageServiceClient()
 
-tagger = nltk.data.load('taggers/maxent_treebank_pos_tagger/english.pickle')
-
-reddit = praw.Reddit('sourcesbot', user_agent='web:sourcesbot:v0.0.1 by /u/michaelh115')
+reddit = praw.Reddit('sourcesbot', user_agent='web:sourcesbot:v0.0.2 by /u/michaelh115')
 
 TEMPLATE = '''Other sources for this story:
 
@@ -40,6 +39,31 @@ TEMPLATE_NFOUND = '''No acceptable matches were found
 __________
 
 ^*[feedback](https://www.reddit.com/r/sourcesbot/comments/6v0pa5/feedback/)* ^| ^*[usage](https://www.reddit.com/r/sourcesbot/wiki/index)* ^| ^*[code]($code)* ^| ^*author:* ^*$writer*'''
+
+class Snippet
+
+class Langtree():
+	def __tree_from_point(point)
+	def from_data(self, annotated):
+		processed = [False for i in annotated.tokens]
+		t = 0 # iterator for scanning flattened tree
+		parent = None # parent index currently unset and it may not be 0
+		while False in processed:
+			token = annotated.tokens[t]
+
+def annotate(text):
+	'''Gets Google Natural Language API to annotate a sentence'''
+	document = types.Document(
+		content=text,
+		type=enums.Document.Type.PLAIN_TEXT
+	)
+	features={
+		"extract_syntax":				True,
+		"extract_entities":				True,
+		"extract_document_sentiment":	False,
+		"extract_entity_sentiment":		False,
+	}
+	return(client.annotate_text(document=document, features=features))
 
 def read_words(n, key, subk, r):
 	name = ''
