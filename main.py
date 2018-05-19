@@ -87,19 +87,6 @@ def annotate(text):
 	annotated = client.annotate_text(document=document, features=features, encoding_type='UTF8')
 	return(make_trees(annotated, make_reference_table(annotated)))
 
-def read_words(n, key, subk, r):
-	name = ''
-	for l in n.leaves():
-		if l[0] not in NOT_GPE:
-			name += l[0] + ' '
-		else:
-			if l[0] not in r['talley']['people']:
-				r[key][subk].append(l[0].lower())
-	name = name[:len(name)-1]
-	if name not in r[key][subk]:
-		r[key][subk].append(name.lower())
-	return(r)
-
 def find_mandatory_words_start(t, n, r):
 	if n == 0: # start end
 		if len(t) > 2 and len(t[n+1]) == 2:
@@ -128,28 +115,28 @@ def find_mandatory_words_end(t, n, r):
 
 def get_characteristics(t, r):
 	# Get people, places, organizations, actions and other things of signifigance
-	for n in range(len(t)):
-		if type(t[n]) == nltk.tree.Tree:
-			if t[n].label() == 'GPE':
-				r = read_words(t[n], 'talley', 'places', r)
-			elif t[n].label() == 'ORGANIZATION':
-				r = read_words(t[n], 'talley', 'organizations', r)
-			elif t[n].label() == 'PERSON':
-				r = find_mandatory_words_start(t, n, r)
-				r = read_words(t[n], 'talley', 'people', r)
-			else:
-				get_characteristics(t[n], r)
-		else:
-			if len(t[n]) == 2:
-				if t[n][1].startswith('N'):
-					if t[n][0].lower() not in r['talley']['things']:
-						r['talley']['things'].append(t[n][0].lower())
-				elif t[n][1].startswith('V'):
-					if (t[n][0].lower() not in r['talley']['actions'] and
-						t[n][0].lower() not in USELESS_VERBS):
-						r['talley']['actions'].append(t[n][0].lower())
-				elif t[n][1] == ':':
-					r = find_mandatory_words_end(t, n, r)
+	if t.entity is not None:
+		if t.entity.type == 'LOCATION':
+			if t.syntax.simplified not in r['talley']['places']:
+				r['talley']['places'].append(t.syntax.simplified)
+		elif t.entity.type == 'ORGANIZATION':
+			if t.syntax.simplified not in r['talley']['organizations']:
+				r['talley']['organizations'].append(t.syntax.simplified)
+		elif t.entity.type == 'PERSON':
+			if t.syntax.simplified not in r['talley']['people']:
+				r['talley']['people'].append(t.syntax.simplified)
+	else:
+		if t.syntax.tag == 'NOUN':
+			if t.syntax.simplified not in r['talley']['things']:
+						r['talley']['things'].append(t.syntax.simplified)
+		elif t.syntax.tag == 'VERB':
+			if t.syntax.simplified not in r['talley']['actions']:
+						r['talley']['actions'].append(t.syntax.simplified)
+		# needs to be rewritten
+		#elif t.syntax.tag == 'PUNCT':
+		#	r = find_mandatory_words_end(t, n, r)
+	for b in t.branches:
+		get_characteristics(b, r)
 	return(r)
 
 class Source:
