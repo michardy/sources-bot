@@ -3,7 +3,7 @@ import datetime
 # News sites I respond to (Sites in this list may not nessisarily be reliable)
 # Note: I (the bot) only speak english so this list may be limited
 # Note: I don't support the Korean Central News Agency because it is too hard to support
-#	It attempts to be statefull using a statless protocol and thus brakes all hyperlinking
+#	It attempts to be statefull using a statless protocol and thus breaks all hyperlinking
 SITES = [
 	'abcactionnews.com/news', # Some kind of affilate (US local)
 	'abcnews.go.com', # ABC news US broadcaster (Disney subdomain)
