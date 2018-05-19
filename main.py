@@ -15,6 +15,8 @@ except ImportError:
 	from urllib.parse import urljoin
 
 from news import *
+import entity.Entity as Entity
+import langtree.Langtree as Langtree # syntax is used here
 
 client = language.LanguageServiceClient()
 
@@ -42,21 +44,36 @@ __________
 
 class Snippet():
 	def __init__(self, token):
-		
+		self.__token = token
 
-class Langtree():
-	def __tree_from_point(self, point, tokens):
-		if point == tokens[point].dependency_edge.head_token_index:
-			self._data
-	def from_data(self, annotated):
-		processed = [False for i in annotated.tokens]
-		t = 0 # iterator for scanning flattened tree
-		parent = None # parent index currently unset and it may not be 0
-		while False in processed:
+def make_trees(annotated, ref):
+	'''Finds all sentence roots in all annotated sentences and makes and array of trees with them'''
+	processed = [False for i in annotated.tokens]
+	t = 0 # iterator for scanning flattened tree
+	trees = []
+	while False in processed:
+		if not processed[t]:
 			token = annotated.tokens[t]
+			if token.dependency_edge.head_token_index == t:
+				print(str(token.dependency_edge.head_token_index) + ' == ' + str(t))
+				trees.append(Langtree(t, annotate.tokens, processed, ref))
+		if t < len(processed) - 1:
+			t += 1
+		else:
+			break
+	return(trees)
+
+def make_reference_table(annotated):
+	'''Makes a temporary reference dictionary containing all tagged entities.
+	The keys in the dictionary are the charater offsets'''
+	table = {}
+	for e in annotated.entities:
+		for m in e.mentions:
+			table[m.text.begin_offset] = Entity(e, m)
+	return(table)
 
 def annotate(text):
-	'''Gets Google Natural Language API to annotate a sentence'''
+	'''Gets Google Natural Language API to annotate a sentence and then converts it to a tree which is returned'''
 	document = types.Document(
 		content=text,
 		type=enums.Document.Type.PLAIN_TEXT
@@ -67,7 +84,8 @@ def annotate(text):
 		"extract_document_sentiment":	False,
 		"extract_entity_sentiment":		False,
 	}
-	return(client.annotate_text(document=document, features=features, encoding_type='UTF8'))
+	annotated = client.annotate_text(document=document, features=features, encoding_type='UTF8')
+	return(make_trees(annotated, make_reference_table(annotated)))
 
 def read_words(n, key, subk, r):
 	name = ''
@@ -192,13 +210,11 @@ class AlJazeera(Source):
 					url = urljoin('http://www.aljazeera.com/', url)
 			except KeyError: # Yes, here at Al Jazeera we use empty <a> tags!
 				pass
-			machine_title = nltk.word_tokenize(title)
-			machine_title = cp.parse(tagger.tag(machine_title))
+			machine_title = annotate(title)
 			thresh = 2
 			if desc:
 				thresh += 1
-			desc = nltk.word_tokenize(desc)
-			desc = cp.parse(tagger.tag(desc))
+			desc = annotate(desc)
 			self._content.append({
 				'title':title,
 				'machine_title':machine_title,
@@ -230,13 +246,11 @@ class Bbc(Source):
 			url = h['href']
 			if url.startswith('/'):
 				url = urljoin('http://www.bbc.com/news', url)
-			machine_title = nltk.word_tokenize(title)
-			machine_title = cp.parse(tagger.tag(machine_title))
+			machine_title = annotate(title)
 			thresh = 2
 			if desc:
 				thresh += 1
-			desc = nltk.word_tokenize(desc)
-			desc = cp.parse(tagger.tag(desc))
+			desc = annotate(desc)
 			self._content.append({
 				'title':title,
 				'machine_title':machine_title,
@@ -269,13 +283,11 @@ class Guardian(Source):
 			url = h['href']
 			if url.startswith('/'):
 				url = urljoin('https://www.theguardian.com', url)
-			machine_title = nltk.word_tokenize(title)
-			machine_title = cp.parse(tagger.tag(machine_title))
+			machine_title = annotate(title)
 			thresh = 2
 			if desc:
 				thresh += 1
-			desc = nltk.word_tokenize(desc)
-			desc = cp.parse(tagger.tag(desc))
+			desc = annotate(desc)
 			self._content.append({
 				'title':title,
 				'machine_title':machine_title,
@@ -315,13 +327,11 @@ class Hill(Source):
 			url = h['href']
 			if url.startswith('/'):
 				url = urljoin('http://thehill.com/', url)
-			machine_title = nltk.word_tokenize(title)
-			machine_title = cp.parse(tagger.tag(machine_title))
+			machine_title = annotate(title)
 			thresh = 2
 			if desc:
 				thresh += 1
-			desc = nltk.word_tokenize(desc)
-			desc = cp.parse(tagger.tag(desc))
+			desc = annotate(desc)
 			self._content.append({
 				'title':title,
 				'machine_title':machine_title,
@@ -350,13 +360,11 @@ class Wapo(Source):
 			url = h['href']
 			if url.startswith('/'):
 				url = urljoin('http://www.washingtonpost.com', url)
-			machine_title = nltk.word_tokenize(title)
-			machine_title = cp.parse(tagger.tag(machine_title))
+			machine_title = annotate(title)
 			thresh = 2
 			if desc:
 				thresh += 1
-			desc = nltk.word_tokenize(desc)
-			desc = cp.parse(tagger.tag(desc))
+			desc = annotate(desc)
 			self._content.append({
 				'title':title,
 				'machine_title':machine_title,
@@ -376,8 +384,7 @@ class Wapo(Source):
 
 def uin(cp):
 	s = input('story: ')
-	story = nltk.word_tokenize(s)
-	story = tagger.tag(story)
+	story = annotate(s)
 	return(cp.parse(story))
 
 def strip(s):
@@ -460,11 +467,9 @@ def process(title, sources, url):
 	stories = []
 	opinions = []
 	thresh_off = 0
-	t = nltk.word_tokenize(title)
-	t = tagger.tag(t)
-	t = cp.parse(t)
+	ann = annotate(title)
 	# The default r NEEDS to be passed or the function below becomes possessed
-	t = get_characteristics(t, {
+	t = get_characteristics(ann, {
 		'talley':{
 			'places':[],
 			'people':[],
