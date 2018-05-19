@@ -1,6 +1,7 @@
-# Natural Language Toolkit: code_traverse
-# add collection into list for back searching
-import nltk
+from google.cloud import language
+from google.cloud.language import enums
+from google.cloud.language import types
+
 import datetime
 import re
 import praw
@@ -14,12 +15,12 @@ except ImportError:
 	from urllib.parse import urljoin
 
 from news import *
+from entity import Entity
+from langtree import Langtree # syntax is used here
 
-cp = nltk.data.load('chunkers/maxent_ne_chunker/english_ace_multiclass.pickle')
+client = language.LanguageServiceClient()
 
-tagger = nltk.data.load('taggers/maxent_treebank_pos_tagger/english.pickle')
-
-reddit = praw.Reddit('sourcesbot', user_agent='web:sourcesbot:v0.0.1 by /u/michaelh115')
+reddit = praw.Reddit('sourcesbot', user_agent='web:sourcesbot:v0.0.2 by /u/michaelh115')
 
 TEMPLATE = '''Other sources for this story:
 
@@ -41,18 +42,50 @@ __________
 
 ^*[feedback](https://www.reddit.com/r/sourcesbot/comments/6v0pa5/feedback/)* ^| ^*[usage](https://www.reddit.com/r/sourcesbot/wiki/index)* ^| ^*[code]($code)* ^| ^*author:* ^*$writer*'''
 
-def read_words(n, key, subk, r):
-	name = ''
-	for l in n.leaves():
-		if l[0] not in NOT_GPE:
-			name += l[0] + ' '
+class Snippet():
+	def __init__(self, token):
+		self.__token = token
+
+def make_trees(annotated, ref):
+	'''Finds all sentence roots in all annotated sentences and makes and array of trees with them'''
+	processed = [False for i in annotated.tokens]
+	t = 0 # iterator for scanning flattened tree
+	trees = []
+	while False in processed:
+		if not processed[t]:
+			token = annotated.tokens[t]
+			if token.dependency_edge.head_token_index == t:
+				print(str(token.dependency_edge.head_token_index) + ' == ' + str(t))
+				trees.append(Langtree(t, annotated.tokens, processed, ref))
+		if t < len(processed) - 1:
+			t += 1
 		else:
-			if l[0] not in r['talley']['people']:
-				r[key][subk].append(l[0].lower())
-	name = name[:len(name)-1]
-	if name not in r[key][subk]:
-		r[key][subk].append(name.lower())
-	return(r)
+			break
+	return(trees)
+
+def make_reference_table(annotated):
+	'''Makes a temporary reference dictionary containing all tagged entities.
+	The keys in the dictionary are the charater offsets'''
+	table = {}
+	for e in annotated.entities:
+		for m in e.mentions:
+			table[m.text.begin_offset] = Entity(e, m)
+	return(table)
+
+def annotate(text):
+	'''Gets Google Natural Language API to annotate a sentence and then converts it to a tree which is returned'''
+	document = types.Document(
+		content=text,
+		type=enums.Document.Type.PLAIN_TEXT
+	)
+	features={
+		"extract_syntax":				True,
+		"extract_entities":				True,
+		"extract_document_sentiment":	False,
+		"extract_entity_sentiment":		False,
+	}
+	annotated = client.annotate_text(document=document, features=features, encoding_type='UTF8')
+	return(make_trees(annotated, make_reference_table(annotated)))
 
 def find_mandatory_words_start(t, n, r):
 	if n == 0: # start end
@@ -82,28 +115,28 @@ def find_mandatory_words_end(t, n, r):
 
 def get_characteristics(t, r):
 	# Get people, places, organizations, actions and other things of signifigance
-	for n in range(len(t)):
-		if type(t[n]) == nltk.tree.Tree:
-			if t[n].label() == 'GPE':
-				r = read_words(t[n], 'talley', 'places', r)
-			elif t[n].label() == 'ORGANIZATION':
-				r = read_words(t[n], 'talley', 'organizations', r)
-			elif t[n].label() == 'PERSON':
-				r = find_mandatory_words_start(t, n, r)
-				r = read_words(t[n], 'talley', 'people', r)
-			else:
-				get_characteristics(t[n], r)
-		else:
-			if len(t[n]) == 2:
-				if t[n][1].startswith('N'):
-					if t[n][0].lower() not in r['talley']['things']:
-						r['talley']['things'].append(t[n][0].lower())
-				elif t[n][1].startswith('V'):
-					if (t[n][0].lower() not in r['talley']['actions'] and
-						t[n][0].lower() not in USELESS_VERBS):
-						r['talley']['actions'].append(t[n][0].lower())
-				elif t[n][1] == ':':
-					r = find_mandatory_words_end(t, n, r)
+	if t.entity is not None:
+		if t.entity.type == 'LOCATION':
+			if t.syntax.simplified not in r['talley']['places']:
+				r['talley']['places'].append(t.syntax.simplified)
+		elif t.entity.type == 'ORGANIZATION':
+			if t.syntax.simplified not in r['talley']['organizations']:
+				r['talley']['organizations'].append(t.syntax.simplified)
+		elif t.entity.type == 'PERSON':
+			if t.syntax.simplified not in r['talley']['people']:
+				r['talley']['people'].append(t.syntax.simplified)
+	else:
+		if t.syntax.tag == 'NOUN':
+			if t.syntax.simplified not in r['talley']['things']:
+						r['talley']['things'].append(t.syntax.simplified)
+		elif t.syntax.tag == 'VERB':
+			if t.syntax.simplified not in r['talley']['actions']:
+						r['talley']['actions'].append(t.syntax.simplified)
+		# needs to be rewritten
+		#elif t.syntax.tag == 'PUNCT':
+		#	r = find_mandatory_words_end(t, n, r)
+	for b in t.branches:
+		get_characteristics(b, r)
 	return(r)
 
 class Source:
@@ -164,13 +197,11 @@ class AlJazeera(Source):
 					url = urljoin('http://www.aljazeera.com/', url)
 			except KeyError: # Yes, here at Al Jazeera we use empty <a> tags!
 				pass
-			machine_title = nltk.word_tokenize(title)
-			machine_title = cp.parse(tagger.tag(machine_title))
+			machine_title = annotate(title)
 			thresh = 2
 			if desc:
 				thresh += 1
-			desc = nltk.word_tokenize(desc)
-			desc = cp.parse(tagger.tag(desc))
+			desc = annotate(desc)
 			self._content.append({
 				'title':title,
 				'machine_title':machine_title,
@@ -244,13 +275,11 @@ class Guardian(Source):
 			url = h['href']
 			if url.startswith('/'):
 				url = urljoin('https://www.theguardian.com', url)
-			machine_title = nltk.word_tokenize(title)
-			machine_title = cp.parse(tagger.tag(machine_title))
+			machine_title = annotate(title)
 			thresh = 2
 			if desc:
 				thresh += 1
-			desc = nltk.word_tokenize(desc)
-			desc = cp.parse(tagger.tag(desc))
+			desc = annotate(desc)
 			self._content.append({
 				'title':title,
 				'machine_title':machine_title,
@@ -290,13 +319,11 @@ class Hill(Source):
 			url = h['href']
 			if url.startswith('/'):
 				url = urljoin('http://thehill.com/', url)
-			machine_title = nltk.word_tokenize(title)
-			machine_title = cp.parse(tagger.tag(machine_title))
+			machine_title = annotate(title)
 			thresh = 2
 			if desc:
 				thresh += 1
-			desc = nltk.word_tokenize(desc)
-			desc = cp.parse(tagger.tag(desc))
+			desc = annotate(desc)
 			self._content.append({
 				'title':title,
 				'machine_title':machine_title,
@@ -325,13 +352,11 @@ class Wapo(Source):
 			url = h['href']
 			if url.startswith('/'):
 				url = urljoin('http://www.washingtonpost.com', url)
-			machine_title = nltk.word_tokenize(title)
-			machine_title = cp.parse(tagger.tag(machine_title))
+			machine_title = annotate(title)
 			thresh = 2
 			if desc:
 				thresh += 1
-			desc = nltk.word_tokenize(desc)
-			desc = cp.parse(tagger.tag(desc))
+			desc = annotate(desc)
 			self._content.append({
 				'title':title,
 				'machine_title':machine_title,
@@ -351,8 +376,7 @@ class Wapo(Source):
 
 def uin(cp):
 	s = input('story: ')
-	story = nltk.word_tokenize(s)
-	story = tagger.tag(story)
+	story = annotate(s)
 	return(cp.parse(story))
 
 def strip(s):
@@ -435,11 +459,9 @@ def process(title, sources, url):
 	stories = []
 	opinions = []
 	thresh_off = 0
-	t = nltk.word_tokenize(title)
-	t = tagger.tag(t)
-	t = cp.parse(t)
+	ann = annotate(title)
 	# The default r NEEDS to be passed or the function below becomes possessed
-	t = get_characteristics(t, {
+	t = get_characteristics(ann, {
 		'talley':{
 			'places':[],
 			'people':[],
