@@ -1,4 +1,4 @@
-import syntax.Syntax as Syntax
+from syntax import Syntax
 
 class Langtree():
 	'''Fully annotated tree representing sentence structure.
@@ -11,7 +11,7 @@ class Langtree():
 				token = tokens[t]
 				print('\tsearching child: {t} for {parent}: {out}'.format(t=t, parent=parent, out=(token.dependency_edge.head_token_index == parent)))
 				if token.dependency_edge.head_token_index == parent:
-					return(Langtree(t, annotate.tokens, processed, ref))
+					return(Langtree(t, tokens, processed, ref))
 			if t < len(processed) - 1:
 				t += 1
 			else:
@@ -19,6 +19,7 @@ class Langtree():
 
 	def __init__(self, parent, tokens, processed, ref):
 		'''Initializes a tree based on a provided root'''
+		self.processed = False # has this tag been checked?
 		self.syntax = Syntax(tokens[parent], parent)
 		try:
 			self.entity = ref[tokens[parent].text.begin_offset]

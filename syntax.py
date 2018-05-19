@@ -26,5 +26,5 @@ class Syntax():
 		self.mood        = token.part_of_speech.mood
 		self.proper      = token.part_of_speech.proper
 		self.reciprocity = token.part_of_speech.reciprocity
-        self.tense       = token.part_of_speech.tense
-        self.voice       = token.part_of_speech.voice
+		self.tense       = token.part_of_speech.tense
+		self.voice       = token.part_of_speech.voice

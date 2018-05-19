@@ -15,8 +15,8 @@ except ImportError:
 	from urllib.parse import urljoin
 
 from news import *
-import entity.Entity as Entity
-import langtree.Langtree as Langtree # syntax is used here
+from entity import Entity
+from langtree import Langtree # syntax is used here
 
 client = language.LanguageServiceClient()
 
@@ -56,7 +56,7 @@ def make_trees(annotated, ref):
 			token = annotated.tokens[t]
 			if token.dependency_edge.head_token_index == t:
 				print(str(token.dependency_edge.head_token_index) + ' == ' + str(t))
-				trees.append(Langtree(t, annotate.tokens, processed, ref))
+				trees.append(Langtree(t, annotated.tokens, processed, ref))
 		if t < len(processed) - 1:
 			t += 1
 		else:
