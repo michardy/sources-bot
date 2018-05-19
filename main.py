@@ -189,40 +189,43 @@ class AlJazeera(Source):
 		self._characterize()
 
 class Bbc(Source):
-	def __isolate_content(self, links):
+	def __isolate_content(self, stories):
 		self._content = []
-		for h in links:
+		for s in stories:
 			desc = ''
-			if not str(h.contents[0].contents[0]).startswith('<'):
-				title = h.contents[0].contents[0]
-				if len(h.parent.contents) > 1:
-					desc = h.parent.contents[1].contents[0]
-			else:
-				title = h.contents[1].contents[0]
-			url = h['href']
-			if url.startswith('/'):
-				url = urljoin('http://www.bbc.com/news', url)
-			machine_title = nltk.word_tokenize(title)
-			machine_title = cp.parse(tagger.tag(machine_title))
-			thresh = 2
-			if desc:
-				thresh += 1
-			desc = nltk.word_tokenize(desc)
-			desc = cp.parse(tagger.tag(desc))
-			self._content.append({
-				'title':title,
-				'machine_title':machine_title,
-				'description':desc,
-				'threshold':thresh,
-				'url':url
-			})
+			h = s.find_all('a', {'class':'gs-c-promo-heading'})
+			if len(h) > 0:
+				if not str(h[0].contents[0].contents[0]).startswith('<'):
+					title = h[0].contents[0].contents[0]
+				else:
+					title = h[0].contents[1].contents[0]
+				d = s.find_all({'class':'gs-c-promo-summary'})
+				if len(d) > 0:
+						desc = d[0].contents[0]
+				url = h[0]['href']
+				if url.startswith('/'):
+					url = urljoin('http://www.bbc.com/news', url)
+				machine_title = nltk.word_tokenize(title)
+				machine_title = cp.parse(tagger.tag(machine_title))
+				thresh = 2
+				if desc:
+					thresh += 1
+				desc = nltk.word_tokenize(desc)
+				desc = cp.parse(tagger.tag(desc))
+				self._content.append({
+					'title':title,
+					'machine_title':machine_title,
+					'description':desc,
+					'threshold':thresh,
+					'url':url
+				})
 
 	def update(self):
 		self._time = datetime.datetime.utcnow()
 		r = urllib2.urlopen("http://www.bbc.com/news")
 		html = r.read()
 		soup = BeautifulSoup(html, "html.parser")
-		links = soup.find_all('a', {'class':'gs-c-promo-heading'})
+		links = soup.find_all('div', {'class':'gs-c-promo'})
 		self.__isolate_content(links)
 		self._characterize()
 
