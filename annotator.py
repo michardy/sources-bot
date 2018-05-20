@@ -45,7 +45,7 @@ class Annotator:
 				table[m.text.begin_offset] = Entity(e, m)
 		return(table)
 
-	def annotate(text):
+	def annotate(self, text):
 		'''Gets Google Natural Language API to annotate a sentence and then converts it to a tree which is returned'''
 		document = types.Document(
 			content=text,
