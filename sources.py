@@ -1,4 +1,5 @@
 import datetime
+from bs4 import BeautifulSoup
 try:
 	import urllib2
 	from urlparse import urljoin

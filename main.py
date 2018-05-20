@@ -1,7 +1,6 @@
 import datetime
 import re
 import praw
-from bs4 import BeautifulSoup
 from string import Template
 
 from google.cloud.language import enums
