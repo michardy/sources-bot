@@ -55,7 +55,7 @@ def make_trees(annotated, ref):
 		if not processed[t]:
 			token = annotated.tokens[t]
 			if token.dependency_edge.head_token_index == t:
-				print(str(token.dependency_edge.head_token_index) + ' == ' + str(t))
+				#print(str(token.dependency_edge.head_token_index) + ' == ' + str(t))
 				trees.append(Langtree(t, annotated.tokens, processed, ref))
 		if t < len(processed) - 1:
 			t += 1
@@ -496,7 +496,9 @@ def template_links(stories):
 	for s in reversed(sorted(stories, key=lambda k: k['score'])):
 		if s['url'] not in urls:
 			n += 1
-			out += f'{str(n)}. [{s["title"]}]({s["url"]}) ({str(s["score"])})\n'
+			out += '{n}. [{title}]({url}) ({score})\n'.template(
+				n=str(n), title=s["title"], url=s["url"], score=str(s["score"])
+			)
 			urls.append(s['url'])
 	return(out)
 
