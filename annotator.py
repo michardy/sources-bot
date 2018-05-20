@@ -25,7 +25,7 @@ class Annotator:
 		else:
 			self.features = features
 
-	def __make_trees(annotated, ref):
+	def __make_trees(self, annotated, ref):
 		'''Finds all sentence roots in all annotated sentences and makes and array of trees with them'''
 		processed = [False for i in annotated.tokens]
 		t = 0 # iterator for scanning flattened tree
@@ -42,7 +42,7 @@ class Annotator:
 				break
 		return(trees)
 
-	def __make_reference_table(annotated):
+	def __make_reference_table(self, annotated):
 		'''Makes a temporary reference dictionary containing all tagged entities.
 		The keys in the dictionary are the charater offsets'''
 		table = {}
@@ -65,6 +65,6 @@ class Annotator:
 			features=self.features,
 			encoding_type=self.encoding
 		)
-		return(__make_trees(
-			annotated, __make_reference_table(annotated)
+		return(self.__make_trees(
+			annotated, self.__make_reference_table(annotated)
 		))
