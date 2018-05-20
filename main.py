@@ -15,12 +15,14 @@ except ImportError:
 	from urllib.parse import urljoin
 
 from news import *
-from entity import Entity
-from langtree import Langtree # syntax is used here
+
+from annotator import Annotator
 
 client = language.LanguageServiceClient()
 
 reddit = praw.Reddit('sourcesbot', user_agent='web:sourcesbot:v0.0.2 by /u/michaelh115')
+
+annotator = Annotator()
 
 TEMPLATE = '''Other sources for this story:
 
@@ -42,50 +44,7 @@ __________
 
 ^*[feedback](https://www.reddit.com/r/sourcesbot/comments/6v0pa5/feedback/)* ^| ^*[usage](https://www.reddit.com/r/sourcesbot/wiki/index)* ^| ^*[code]($code)* ^| ^*author:* ^*$writer*'''
 
-class Snippet():
-	def __init__(self, token):
-		self.__token = token
 
-def make_trees(annotated, ref):
-	'''Finds all sentence roots in all annotated sentences and makes and array of trees with them'''
-	processed = [False for i in annotated.tokens]
-	t = 0 # iterator for scanning flattened tree
-	trees = []
-	while False in processed:
-		if not processed[t]:
-			token = annotated.tokens[t]
-			if token.dependency_edge.head_token_index == t:
-				#print(str(token.dependency_edge.head_token_index) + ' == ' + str(t))
-				trees.append(Langtree(t, annotated.tokens, processed, ref))
-		if t < len(processed) - 1:
-			t += 1
-		else:
-			break
-	return(trees)
-
-def make_reference_table(annotated):
-	'''Makes a temporary reference dictionary containing all tagged entities.
-	The keys in the dictionary are the charater offsets'''
-	table = {}
-	for e in annotated.entities:
-		for m in e.mentions:
-			table[m.text.begin_offset] = Entity(e, m)
-	return(table)
-
-def annotate(text):
-	'''Gets Google Natural Language API to annotate a sentence and then converts it to a tree which is returned'''
-	document = types.Document(
-		content=text,
-		type=enums.Document.Type.PLAIN_TEXT
-	)
-	features={
-		"extract_syntax":				True,
-		"extract_entities":				True,
-		"extract_document_sentiment":	False,
-		"extract_entity_sentiment":		False,
-	}
-	annotated = client.annotate_text(document=document, features=features, encoding_type='UTF8')
-	return(make_trees(annotated, make_reference_table(annotated)))
 
 def find_mandatory_words_start(t, n, r):
 	if n == 0: # start end
@@ -202,11 +161,11 @@ class AlJazeera(Source):
 					url = urljoin('http://www.aljazeera.com/', url)
 			except KeyError: # Yes, here at Al Jazeera we use empty <a> tags!
 				pass
-			machine_title = annotate(title)
+			machine_title = annotator.annotate(title)
 			thresh = 2
 			if desc:
 				thresh += 1
-			desc = annotate(desc)
+			desc = annotator.annotate(desc)
 			self._content.append({
 				'title':title,
 				'machine_title':machine_title,
@@ -241,11 +200,11 @@ class Bbc(Source):
 				url = h[0]['href']
 				if url.startswith('/'):
 					url = urljoin('http://www.bbc.com/news', url)
-				machine_title = annotate(title)
+				machine_title = annotator.annotate(title)
 				thresh = 2
 				if desc:
 					thresh += 1
-				desc = annotate(desc)
+				desc = annotator.annotate(desc)
 				self._content.append({
 					'title':title,
 					'machine_title':machine_title,
@@ -278,11 +237,11 @@ class Guardian(Source):
 			url = h['href']
 			if url.startswith('/'):
 				url = urljoin('https://www.theguardian.com', url)
-			machine_title = annotate(title)
+			machine_title = annotator.annotate(title)
 			thresh = 2
 			if desc:
 				thresh += 1
-			desc = annotate(desc)
+			desc = annotator.annotate(desc)
 			self._content.append({
 				'title':title,
 				'machine_title':machine_title,
@@ -322,11 +281,11 @@ class Hill(Source):
 			url = h['href']
 			if url.startswith('/'):
 				url = urljoin('http://thehill.com/', url)
-			machine_title = annotate(title)
+			machine_title = annotator.annotate(title)
 			thresh = 2
 			if desc:
 				thresh += 1
-			desc = annotate(desc)
+			desc = annotator.annotate(desc)
 			self._content.append({
 				'title':title,
 				'machine_title':machine_title,
@@ -355,11 +314,11 @@ class Wapo(Source):
 			url = h['href']
 			if url.startswith('/'):
 				url = urljoin('http://www.washingtonpost.com', url)
-			machine_title = annotate(title)
+			machine_title = annotator.annotate(title)
 			thresh = 2
 			if desc:
 				thresh += 1
-			desc = annotate(desc)
+			desc = annotator.annotate(desc)
 			self._content.append({
 				'title':title,
 				'machine_title':machine_title,
@@ -379,7 +338,7 @@ class Wapo(Source):
 
 def uin(cp):
 	s = input('story: ')
-	story = annotate(s)
+	story = annotator.annotate(s)
 	return(cp.parse(story))
 
 def strip(s):
@@ -462,7 +421,7 @@ def process(title, sources, url):
 	stories = []
 	opinions = []
 	thresh_off = 0
-	ann = annotate(title)
+	ann = annotator.annotate(title)
 	# The default r NEEDS to be passed or the function below becomes possessed
 	t = get_characteristics_from_list(ann, {
 		'talley':{
