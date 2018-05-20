@@ -57,7 +57,7 @@ class Annotator:
 			content=text,
 			type=enums.Document.Type.PLAIN_TEXT
 		)
-		while datetime.datetime.utcnow()-self.__lastcall > datetime.timedelta(seconds=1):
+		while datetime.datetime.utcnow()-self.__lastcall < datetime.timedelta(seconds=1):
 			time.sleep(1) # Need to find a better way of doing this
 		self.__lastcall = datetime.datetime.utcnow()
 		annotated = client.annotate_text(
