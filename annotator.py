@@ -8,6 +8,8 @@ import time
 from entity import Entity
 from langtree import Langtree # syntax is used here
 
+client = language.LanguageServiceClient()
+
 class Annotator:
 	'''Provides and regulates (rate limits) access to Google Cloud Natural Language API'''
 	def __init__(self, features=None, encoding='UTF8'):
