@@ -65,6 +65,6 @@ class Annotator:
 			features=self.features,
 			encoding_type=self.encoding
 		)
-		return(self.__make_trees(
-			annotated, self.__make_reference_table(annotated)
+		return(__make_trees(
+			annotated, __make_reference_table(annotated)
 		))
