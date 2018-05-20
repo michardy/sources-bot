@@ -241,13 +241,11 @@ class Bbc(Source):
 				url = h[0]['href']
 				if url.startswith('/'):
 					url = urljoin('http://www.bbc.com/news', url)
-				machine_title = nltk.word_tokenize(title)
-				machine_title = cp.parse(tagger.tag(machine_title))
+				machine_title = annotate(title)
 				thresh = 2
 				if desc:
 					thresh += 1
-				desc = nltk.word_tokenize(desc)
-				desc = cp.parse(tagger.tag(desc))
+				desc = annotate(desc)
 				self._content.append({
 					'title':title,
 					'machine_title':machine_title,
