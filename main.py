@@ -3,12 +3,6 @@ import re
 import praw
 from bs4 import BeautifulSoup
 from string import Template
-try:
-	import urllib2
-	from urlparse import urljoin
-except ImportError:
-	import urllib.request as urllib2
-	from urllib.parse import urljoin
 
 from google.cloud.language import enums
 
