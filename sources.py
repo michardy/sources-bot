@@ -9,6 +9,8 @@ except ImportError:
 
 from annotator import Annotator
 
+annotator = Annotator()
+
 class Source:
 	def __init__(self):
 		self._time = None
