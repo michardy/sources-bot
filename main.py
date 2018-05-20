@@ -329,10 +329,10 @@ class Wapo(Source):
 		self.__isolate_content(links)
 		self._characterize()
 
-def uin(cp):
+def uin():
 	s = input('story: ')
 	story = annotator.annotate(s)
-	return(cp.parse(story))
+	return(story)
 
 def strip(s):
 	s = s.lower()
@@ -359,7 +359,7 @@ def dedup_entities(entities):
 	entities['talley'] = et
 	return(entities)
 
-def calc_overlap(title, s, cp):
+def calc_overlap(title, s):
 	overlap = 0
 	for k in title['talley'].keys():
 		for i in title['talley'][k]:
@@ -374,11 +374,11 @@ def calc_overlap(title, s, cp):
 						len(i) > 2)
 	return(overlap)
 
-def score_stories(s, wc, cp, source_url, t_off):
+def score_stories(s, wc, source_url, t_off):
 	stories = []
 	opinions = []
 	for h in wc:
-		o = calc_overlap(h['character'], s, cp)
+		o = calc_overlap(h['character'], s)
 		thresh = h['threshold']
 		thresh += t_off
 		url = h['url']
@@ -433,7 +433,7 @@ def process(title, sources, url):
 		thresh_off += 1
 	for s in sources:
 		res = s.get()
-		out = score_stories(t, res, cp, url, thresh_off)
+		out = score_stories(t, res, url, thresh_off)
 		stories += out[0]
 		opinions += out[1]
 	return(stories, opinions)
