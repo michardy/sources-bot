@@ -451,7 +451,7 @@ def template_links(stories):
 	for s in reversed(sorted(stories, key=lambda k: k['score'])):
 		if s['url'] not in urls:
 			n += 1
-			out += '{n}. [{title}]({url}) ({score})\n'.template(
+			out += '{n}. [{title}]({url}) ({score})\n'.format(
 				n=str(n), title=s["title"], url=s["url"], score=str(s["score"])
 			)
 			urls.append(s['url'])
