@@ -1,7 +1,3 @@
-from google.cloud import language
-from google.cloud.language import enums
-from google.cloud.language import types
-
 import datetime
 import re
 import praw
