@@ -113,6 +113,11 @@ def find_mandatory_words_end(t, n, r):
 				r = read_words(t[n+4], 'mandate', 'speakers', r)
 	return(r)
 
+def get_characteristics_from_list(trees, r):
+	for t in trees:
+		get_characteristics(t, r)
+	return(r)
+
 def get_characteristics(t, r):
 	# Get people, places, organizations, actions and other things of signifigance
 	if t.entity is not None:
@@ -156,7 +161,7 @@ class Source:
 	def _characterize(self):
 		for s in range(len(self._content)):
 			# The default r NEEDS to be passed or the function below becomes possessed
-			c = get_characteristics(
+			c = get_characteristics_from_list(
 				self._content[s]['machine_title'],
 				{
 					'talley':{
@@ -171,7 +176,7 @@ class Source:
 					}
 				}
 			)
-			c = get_characteristics(self._content[s]['description'], c)
+			c = get_characteristics_from_list(self._content[s]['description'], c)
 			c = dedup_entities(c)
 			self._content[s]['character'] = c
 
@@ -461,7 +466,7 @@ def process(title, sources, url):
 	thresh_off = 0
 	ann = annotate(title)
 	# The default r NEEDS to be passed or the function below becomes possessed
-	t = get_characteristics(ann, {
+	t = get_characteristics_from_list(ann, {
 		'talley':{
 			'places':[],
 			'people':[],
