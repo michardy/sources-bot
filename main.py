@@ -17,7 +17,7 @@ except ImportError:
 from news import *
 from annotator import Annotator
 
-sys.setrecursionlimit(10000)
+sys.setrecursionlimit(100000)
 
 reddit = praw.Reddit('sourcesbot', user_agent='web:sourcesbot:v0.0.2 by /u/michaelh115')
 
@@ -485,6 +485,14 @@ def get_story_title(url):
 try:
 	sources = pickle.load(open('sources.db', 'rb'))
 except FileNotFoundError:
+	sources = {
+		AlJazeera(),
+		Bbc(),
+		Guardian(),
+		Hill(),
+		Wapo()
+	}
+except EOFError:
 	sources = {
 		AlJazeera(),
 		Bbc(),
