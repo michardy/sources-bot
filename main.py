@@ -275,7 +275,10 @@ class Hill(Source):
 					title = h.contents[0]
 				except IndexError:
 					pass
-			url = h['href']
+			try:
+				url = h['href']
+			except KeyError:
+				continue
 			if url.startswith('/'):
 				url = urljoin('http://thehill.com/', url)
 			machine_title = annotator.annotate(title)
