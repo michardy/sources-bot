@@ -17,7 +17,7 @@ except ImportError:
 from news import *
 from annotator import Annotator
 
-sys.setrecursionlevel(10000)
+sys.setrecursionlimit(10000)
 
 reddit = praw.Reddit('sourcesbot', user_agent='web:sourcesbot:v0.0.2 by /u/michaelh115')
 
@@ -494,7 +494,7 @@ except FileNotFoundError:
 	}
 for k in sources:
 	k.update()
-for s in reddit.subreddit('news').hot(limit = 30):
+for s in reddit.subreddit('worldnews').hot(limit = 30):
 	if test_in_sites(s.url):
 		title = get_story_title(s.url)
 		stories, opinions = process(title, sources, s.url)
