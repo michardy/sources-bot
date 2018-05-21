@@ -57,14 +57,14 @@ class Annotator:
 			content=text,
 			type=enums.Document.Type.PLAIN_TEXT
 		)
-		while datetime.datetime.utcnow()-self.__lastcall < datetime.timedelta(milliseconds=250):
-			time.sleep(0.125) # Need to find a better way of doing this
-		self.__lastcall = datetime.datetime.utcnow()
+		while datetime.datetime.utcnow()-self.__lastcall < datetime.timedelta(milliseconds=31):
+			time.sleep(0.015625) # Need to find a better way of doing this
 		annotated = client.annotate_text(
 			document=document,
 			features=self.features,
 			encoding_type=self.encoding
 		)
+		self.__lastcall = datetime.datetime.utcnow()
 		return(self.__make_trees(
 			annotated, self.__make_reference_table(annotated)
 		))
