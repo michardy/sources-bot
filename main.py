@@ -1,5 +1,7 @@
 import datetime
 import re
+import pickle
+import sys
 import praw
 from bs4 import BeautifulSoup
 from string import Template
@@ -12,6 +14,8 @@ except ImportError:
 
 from news import *
 from annotator import Annotator
+
+sys.setrecursionlevel(10000)
 
 reddit = praw.Reddit('sourcesbot', user_agent='web:sourcesbot:v0.0.2 by /u/michaelh115')
 
@@ -473,13 +477,16 @@ def get_story_title(url):
 		title = title.split('«')[0]
 	return(title)
 
-sources = {
-	AlJazeera(),
-	Bbc(),
-	Guardian(),
-	Hill(),
-	Wapo()
-}
+try:
+	sources = pickle.load(open('sources.db', 'rb'))
+except FileNotFoundError:
+	sources = {
+		AlJazeera(),
+		Bbc(),
+		Guardian(),
+		Hill(),
+		Wapo()
+	}
 for k in sources:
 	k.update()
 for s in reddit.subreddit('news').hot(limit = 30):
@@ -548,3 +555,4 @@ for mention in reddit.inbox.mentions():
 			else:
 				mention.reply('No matching articles were found')
 '''
+pickle.dump(open('sources.db', 'rb'), sources)
