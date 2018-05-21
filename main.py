@@ -560,4 +560,4 @@ for mention in reddit.inbox.mentions():
 			else:
 				mention.reply('No matching articles were found')
 '''
-pickle.dump(open('sources.db', 'rb'), sources)
+pickle.dump(open('sources.db', 'wb'), sources)
