@@ -152,6 +152,8 @@ class AlJazeera(Source):
 								desc = h.parent.contents[3].contents[0]
 						except KeyError:
 							pass
+						except TypeError:
+							pass
 			except IndexError: # malformed HTML
 				pass
 			try:
@@ -500,8 +502,6 @@ except EOFError:
 		Hill(),
 		Wapo()
 	}
-for k in sources:
-	k.update()
 for s in reddit.subreddit('worldnews').hot(limit = 30):
 	if test_in_sites(s.url):
 		title = get_story_title(s.url)
