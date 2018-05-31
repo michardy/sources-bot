@@ -17,6 +17,8 @@ except ImportError:
 from news import *
 from annotator import Annotator
 
+# Nessisary for caching to work
+# If removed the picking operation will exceed the recursion limit
 sys.setrecursionlimit(100000)
 
 reddit = praw.Reddit('sourcesbot', user_agent='web:sourcesbot:v0.0.2 by /u/michaelh115')
@@ -103,20 +105,24 @@ def get_characteristics(t, r):
 	return(r)
 
 class Source:
+	'''Generic class describing sources and how to parse them'''
 	def __init__(self):
 		self._time = None
 		self._content = None
 
 	def get(self):
+		'''Gets source content and updates it if it is more than 30 minutes old'''
 		refresh = datetime.timedelta(minutes=30)
 		if datetime.datetime.utcnow() - self._time > refresh:
 			self.update()
 		return(self._content)
 
 	def update(self):
+		'''Generic method to scan home pages.  Must be overriden'''
 		raise NotImplementedError("Must override update")
 
 	def _characterize(self):
+		'''Gets the characteristics of every story on a sources home page'''
 		for s in range(len(self._content)):
 			# The default r NEEDS to be passed or the function below becomes possessed
 			c = get_characteristics_from_list(
@@ -341,18 +347,13 @@ class Wapo(Source):
 		self._characterize()
 
 def uin():
+	'''Function to take user input from terminal for testing purposes (dead)'''
 	s = input('story: ')
 	story = annotator.annotate(s)
 	return(story)
 
-def strip(s):
-	s = s.lower()
-	if s.endswith('ed'):
-		return(s[:len(s)-2])
-	elif s.endswith('es'):
-		return(s[:len(s)-2])
-
 def dedup_entities(entities):
+	'''Deduplicate traits idetified by the characterization system'''
 	et = entities['talley']
 	for t in et:
 		e = 0
@@ -371,6 +372,7 @@ def dedup_entities(entities):
 	return(entities)
 
 def calc_overlap(title, s):
+	'''Calculates the overlap in characteristics between stories'''
 	overlap = 0
 	for k in title['talley'].keys():
 		for i in title['talley'][k]:
@@ -386,6 +388,7 @@ def calc_overlap(title, s):
 	return(overlap)
 
 def score_stories(s, wc, source_url, t_off):
+	'''Gets a list of high scoring stories and their scores'''
 	stories = []
 	opinions = []
 	for h in wc:
@@ -414,6 +417,9 @@ def score_stories(s, wc, source_url, t_off):
 	return(stories, opinions)
 
 def title_clean(title):
+	'''Remove fancy directional quotation marks that might break things.
+	This may be unnessisary due to the use of Google Cloud Natural language rather than NLTK
+	'''
 	title = title.replace('‘', "'")
 	title = title.replace('’', "'")
 	title = title.replace('“', '"')
@@ -421,6 +427,7 @@ def title_clean(title):
 	return(title)
 
 def process(title, sources, url):
+	'''Get similar stories for a story'''
 	title = title_clean(title)
 	stories = []
 	opinions = []
@@ -450,6 +457,12 @@ def process(title, sources, url):
 	return(stories, opinions)
 
 def test_in_sites(url):
+	'''Checks if the input story is from an acceptable site.
+	For example this will not return true for:
+	https://entertainment.theonion.com/showrunner-disappointed-world-will-never-see-episode-wh-1826423126
+	But will return true for:
+	https://www.nytimes.com/2018/05/29/opinion/roseanne-canceled-abc-racist-tweets.html
+	'''
 	for s in SITES:
 		if s in url:
 			return(True)
@@ -469,6 +482,12 @@ def template_links(stories):
 	return(out)
 
 def get_story_title(url):
+	'''Remove the little trailing bits that websites add to article titles.
+	for example:
+	Andrew McCabe turned over memo on Comey firing to Mueller - CNNPolitics
+	becomes:
+	Andrew McCabe turned over memo on Comey firing to Mueller
+	'''
 	with urllib2.urlopen(url) as p:
 		html = p.read()
 	soup = BeautifulSoup(html, "html.parser")
