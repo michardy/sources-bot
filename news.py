@@ -36,7 +36,14 @@ SITES = [
 	'haaretz.com,' # Israli newspaper
 	'thehill.com', # US political news site
 	'thehindu.com/news', # Indian news site
-	# 'hindustantimes.com', # Indian newspaper (disabled becase link parsing is complicated and I am unprepared to filter out celebrity videos)
+	'thehindu.com/opinion', # Indian news site
+	'hindustantimes.com/india-news', # Indian newspaper (Was forced to limit subdirectories)
+	'hindustantimes.com/world-news', # Indian newspaper
+	'hindustantimes.com/opinion', # Indian newspaper
+	'hindustantimes.com/buisness', # Indian newspaper
+	'hindustantimes.com/tech', # Indian newspaper
+	'hindustantimes.com/mumbai-news', # Indian newspaper
+	'hindustantimes.com/delhi-news', # Indian newspaper
 	'huffingtonpost.com', # US liberal news commentary site
 	'independent.co.uk/news', # UK newspaper
 	'infowars.com/news/', # This is so far gone I am not sure this software will even work. (The headlines contain too much opinion to reasonably find alternate sourcing) (US conservative news commentary)
