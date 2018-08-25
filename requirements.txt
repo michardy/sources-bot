@@ -1,3 +1,4 @@
-beautifulsoup4==4.6.0
-google-cloud-language==1.0.1
-praw==5.4.0
+beautifulsoup4==4.6.3
+google-cloud-language==1.0.2
+praw==6.0.0
+elasticsearch==6.3.1
