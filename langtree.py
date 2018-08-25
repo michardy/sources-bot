@@ -9,7 +9,6 @@ class Langtree():
 		while False in processed:
 			if not processed[t]:
 				token = tokens[t]
-				print('\tsearching child: {t} for {parent}: {out}'.format(t=t, parent=parent, out=(token.dependency_edge.head_token_index == parent)))
 				if token.dependency_edge.head_token_index == parent:
 					return(Langtree(t, tokens, processed, ref))
 			if t < len(processed) - 1:
@@ -26,7 +25,6 @@ class Langtree():
 		except KeyError:
 			self.entity = None
 		self.branches = []
-		print('found parent: {parent}'.format(parent=parent))
 		processed[parent] = True
 		cont = True
 		while cont:

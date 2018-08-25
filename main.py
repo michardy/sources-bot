@@ -1,9 +1,9 @@
-from google.cloud import language
-from google.cloud.language import enums
-from google.cloud.language import types
+# -*- coding: UTF-8 -*-
 
 import datetime
 import re
+import pickle
+import sys
 import praw
 from bs4 import BeautifulSoup
 from string import Template
@@ -15,12 +15,15 @@ except ImportError:
 	from urllib.parse import urljoin
 
 from news import *
-from entity import Entity
-from langtree import Langtree # syntax is used here
+from annotator import Annotator
 
-client = language.LanguageServiceClient()
+# Nessisary for caching to work
+# If removed the picking operation will exceed the recursion limit
+sys.setrecursionlimit(100000)
 
 reddit = praw.Reddit('sourcesbot', user_agent='web:sourcesbot:v0.0.2 by /u/michaelh115')
+
+annotator = Annotator()
 
 TEMPLATE = '''Other sources for this story:
 
@@ -42,50 +45,7 @@ __________
 
 ^*[feedback](https://www.reddit.com/r/sourcesbot/comments/6v0pa5/feedback/)* ^| ^*[usage](https://www.reddit.com/r/sourcesbot/wiki/index)* ^| ^*[code]($code)* ^| ^*author:* ^*$writer*'''
 
-class Snippet():
-	def __init__(self, token):
-		self.__token = token
 
-def make_trees(annotated, ref):
-	'''Finds all sentence roots in all annotated sentences and makes and array of trees with them'''
-	processed = [False for i in annotated.tokens]
-	t = 0 # iterator for scanning flattened tree
-	trees = []
-	while False in processed:
-		if not processed[t]:
-			token = annotated.tokens[t]
-			if token.dependency_edge.head_token_index == t:
-				print(str(token.dependency_edge.head_token_index) + ' == ' + str(t))
-				trees.append(Langtree(t, annotated.tokens, processed, ref))
-		if t < len(processed) - 1:
-			t += 1
-		else:
-			break
-	return(trees)
-
-def make_reference_table(annotated):
-	'''Makes a temporary reference dictionary containing all tagged entities.
-	The keys in the dictionary are the charater offsets'''
-	table = {}
-	for e in annotated.entities:
-		for m in e.mentions:
-			table[m.text.begin_offset] = Entity(e, m)
-	return(table)
-
-def annotate(text):
-	'''Gets Google Natural Language API to annotate a sentence and then converts it to a tree which is returned'''
-	document = types.Document(
-		content=text,
-		type=enums.Document.Type.PLAIN_TEXT
-	)
-	features={
-		"extract_syntax":				True,
-		"extract_entities":				True,
-		"extract_document_sentiment":	False,
-		"extract_entity_sentiment":		False,
-	}
-	annotated = client.annotate_text(document=document, features=features, encoding_type='UTF8')
-	return(make_trees(annotated, make_reference_table(annotated)))
 
 def find_mandatory_words_start(t, n, r):
 	if n == 0: # start end
@@ -113,25 +73,30 @@ def find_mandatory_words_end(t, n, r):
 				r = read_words(t[n+4], 'mandate', 'speakers', r)
 	return(r)
 
+def get_characteristics_from_list(trees, r):
+	for t in trees:
+		get_characteristics(t, r)
+	return(r)
+
 def get_characteristics(t, r):
 	# Get people, places, organizations, actions and other things of signifigance
 	if t.entity is not None:
-		if t.entity.type == 'LOCATION':
+		if t.entity.type == 2:
 			if t.syntax.simplified not in r['talley']['places']:
 				r['talley']['places'].append(t.syntax.simplified)
-		elif t.entity.type == 'ORGANIZATION':
+		elif t.entity.type == 3:
 			if t.syntax.simplified not in r['talley']['organizations']:
 				r['talley']['organizations'].append(t.syntax.simplified)
-		elif t.entity.type == 'PERSON':
+		elif t.entity.type == 1:
 			if t.syntax.simplified not in r['talley']['people']:
 				r['talley']['people'].append(t.syntax.simplified)
 	else:
-		if t.syntax.tag == 'NOUN':
+		if t.syntax.tag == 6:
 			if t.syntax.simplified not in r['talley']['things']:
-						r['talley']['things'].append(t.syntax.simplified)
-		elif t.syntax.tag == 'VERB':
+				r['talley']['things'].append(t.syntax.simplified)
+		elif t.syntax.tag == 11:
 			if t.syntax.simplified not in r['talley']['actions']:
-						r['talley']['actions'].append(t.syntax.simplified)
+				r['talley']['actions'].append(t.syntax.simplified)
 		# needs to be rewritten
 		#elif t.syntax.tag == 'PUNCT':
 		#	r = find_mandatory_words_end(t, n, r)
@@ -140,23 +105,27 @@ def get_characteristics(t, r):
 	return(r)
 
 class Source:
+	'''Generic class describing sources and how to parse them'''
 	def __init__(self):
 		self._time = None
 		self._content = None
 
 	def get(self):
+		'''Gets source content and updates it if it is more than 30 minutes old'''
 		refresh = datetime.timedelta(minutes=30)
 		if datetime.datetime.utcnow() - self._time > refresh:
 			self.update()
 		return(self._content)
 
 	def update(self):
+		'''Generic method to scan home pages.  Must be overriden'''
 		raise NotImplementedError("Must override update")
 
 	def _characterize(self):
+		'''Gets the characteristics of every story on a sources home page'''
 		for s in range(len(self._content)):
 			# The default r NEEDS to be passed or the function below becomes possessed
-			c = get_characteristics(
+			c = get_characteristics_from_list(
 				self._content[s]['machine_title'],
 				{
 					'talley':{
@@ -171,7 +140,7 @@ class Source:
 					}
 				}
 			)
-			c = get_characteristics(self._content[s]['description'], c)
+			c = get_characteristics_from_list(self._content[s]['description'], c)
 			c = dedup_entities(c)
 			self._content[s]['character'] = c
 
@@ -189,6 +158,8 @@ class AlJazeera(Source):
 								desc = h.parent.contents[3].contents[0]
 						except KeyError:
 							pass
+						except TypeError:
+							pass
 			except IndexError: # malformed HTML
 				pass
 			try:
@@ -197,11 +168,11 @@ class AlJazeera(Source):
 					url = urljoin('http://www.aljazeera.com/', url)
 			except KeyError: # Yes, here at Al Jazeera we use empty <a> tags!
 				pass
-			machine_title = annotate(title)
+			machine_title = annotator.annotate(title)
 			thresh = 2
 			if desc:
 				thresh += 1
-			desc = annotate(desc)
+			desc = annotator.annotate(desc)
 			self._content.append({
 				'title':title,
 				'machine_title':machine_title,
@@ -236,13 +207,11 @@ class Bbc(Source):
 				url = h[0]['href']
 				if url.startswith('/'):
 					url = urljoin('http://www.bbc.com/news', url)
-				machine_title = nltk.word_tokenize(title)
-				machine_title = cp.parse(tagger.tag(machine_title))
+				machine_title = annotator.annotate(title)
 				thresh = 2
 				if desc:
 					thresh += 1
-				desc = nltk.word_tokenize(desc)
-				desc = cp.parse(tagger.tag(desc))
+				desc = annotator.annotate(desc)
 				self._content.append({
 					'title':title,
 					'machine_title':machine_title,
@@ -275,11 +244,11 @@ class Guardian(Source):
 			url = h['href']
 			if url.startswith('/'):
 				url = urljoin('https://www.theguardian.com', url)
-			machine_title = annotate(title)
+			machine_title = annotator.annotate(title)
 			thresh = 2
 			if desc:
 				thresh += 1
-			desc = annotate(desc)
+			desc = annotator.annotate(desc)
 			self._content.append({
 				'title':title,
 				'machine_title':machine_title,
@@ -316,14 +285,17 @@ class Hill(Source):
 					title = h.contents[0]
 				except IndexError:
 					pass
-			url = h['href']
+			try:
+				url = h['href']
+			except KeyError:
+				continue
 			if url.startswith('/'):
 				url = urljoin('http://thehill.com/', url)
-			machine_title = annotate(title)
+			machine_title = annotator.annotate(title)
 			thresh = 2
 			if desc:
 				thresh += 1
-			desc = annotate(desc)
+			desc = annotator.annotate(desc)
 			self._content.append({
 				'title':title,
 				'machine_title':machine_title,
@@ -352,11 +324,11 @@ class Wapo(Source):
 			url = h['href']
 			if url.startswith('/'):
 				url = urljoin('http://www.washingtonpost.com', url)
-			machine_title = annotate(title)
+			machine_title = annotator.annotate(title)
 			thresh = 2
 			if desc:
 				thresh += 1
-			desc = annotate(desc)
+			desc = annotator.annotate(desc)
 			self._content.append({
 				'title':title,
 				'machine_title':machine_title,
@@ -374,19 +346,14 @@ class Wapo(Source):
 		self.__isolate_content(links)
 		self._characterize()
 
-def uin(cp):
+def uin():
+	'''Function to take user input from terminal for testing purposes (dead)'''
 	s = input('story: ')
-	story = annotate(s)
-	return(cp.parse(story))
-
-def strip(s):
-	s = s.lower()
-	if s.endswith('ed'):
-		return(s[:len(s)-2])
-	elif s.endswith('es'):
-		return(s[:len(s)-2])
+	story = annotator.annotate(s)
+	return(story)
 
 def dedup_entities(entities):
+	'''Deduplicate traits idetified by the characterization system'''
 	et = entities['talley']
 	for t in et:
 		e = 0
@@ -404,7 +371,8 @@ def dedup_entities(entities):
 	entities['talley'] = et
 	return(entities)
 
-def calc_overlap(title, s, cp):
+def calc_overlap(title, s):
+	'''Calculates the overlap in characteristics between stories'''
 	overlap = 0
 	for k in title['talley'].keys():
 		for i in title['talley'][k]:
@@ -419,11 +387,12 @@ def calc_overlap(title, s, cp):
 						len(i) > 2)
 	return(overlap)
 
-def score_stories(s, wc, cp, source_url, t_off):
+def score_stories(s, wc, source_url, t_off):
+	'''Gets a list of high scoring stories and their scores'''
 	stories = []
 	opinions = []
 	for h in wc:
-		o = calc_overlap(h['character'], s, cp)
+		o = calc_overlap(h['character'], s)
 		thresh = h['threshold']
 		thresh += t_off
 		url = h['url']
@@ -448,6 +417,9 @@ def score_stories(s, wc, cp, source_url, t_off):
 	return(stories, opinions)
 
 def title_clean(title):
+	'''Remove fancy directional quotation marks that might break things.
+	This may be unnessisary due to the use of Google Cloud Natural language rather than NLTK
+	'''
 	title = title.replace('‘', "'")
 	title = title.replace('’', "'")
 	title = title.replace('“', '"')
@@ -455,13 +427,14 @@ def title_clean(title):
 	return(title)
 
 def process(title, sources, url):
+	'''Get similar stories for a story'''
 	title = title_clean(title)
 	stories = []
 	opinions = []
 	thresh_off = 0
-	ann = annotate(title)
+	ann = annotator.annotate(title)
 	# The default r NEEDS to be passed or the function below becomes possessed
-	t = get_characteristics(ann, {
+	t = get_characteristics_from_list(ann, {
 		'talley':{
 			'places':[],
 			'people':[],
@@ -478,12 +451,18 @@ def process(title, sources, url):
 		thresh_off += 1
 	for s in sources:
 		res = s.get()
-		out = score_stories(t, res, cp, url, thresh_off)
+		out = score_stories(t, res, url, thresh_off)
 		stories += out[0]
 		opinions += out[1]
 	return(stories, opinions)
 
 def test_in_sites(url):
+	'''Checks if the input story is from an acceptable site.
+	For example this will not return true for:
+	https://entertainment.theonion.com/showrunner-disappointed-world-will-never-see-episode-wh-1826423126
+	But will return true for:
+	https://www.nytimes.com/2018/05/29/opinion/roseanne-canceled-abc-racist-tweets.html
+	'''
 	for s in SITES:
 		if s in url:
 			return(True)
@@ -496,11 +475,19 @@ def template_links(stories):
 	for s in reversed(sorted(stories, key=lambda k: k['score'])):
 		if s['url'] not in urls:
 			n += 1
-			out += f'{str(n)}. [{s["title"]}]({s["url"]}) ({str(s["score"])})\n'
+			out += '{n}. [{title}]({url}) ({score})\n'.format(
+				n=str(n), title=s["title"], url=s["url"], score=str(s["score"])
+			)
 			urls.append(s['url'])
 	return(out)
 
 def get_story_title(url):
+	'''Remove the little trailing bits that websites add to article titles.
+	for example:
+	Andrew McCabe turned over memo on Comey firing to Mueller - CNNPolitics
+	becomes:
+	Andrew McCabe turned over memo on Comey firing to Mueller
+	'''
 	with urllib2.urlopen(url) as p:
 		html = p.read()
 	soup = BeautifulSoup(html, "html.parser")
@@ -516,16 +503,25 @@ def get_story_title(url):
 		title = title.split('«')[0]
 	return(title)
 
-sources = {
-	AlJazeera(),
-	Bbc(),
-	Guardian(),
-	Hill(),
-	Wapo()
-}
-for k in sources:
-	k.update()
-for s in reddit.subreddit('news').hot(limit = 30):
+try:
+	sources = pickle.load(open('sources.db', 'rb'))
+except FileNotFoundError:
+	sources = {
+		AlJazeera(),
+		Bbc(),
+		Guardian(),
+		Hill(),
+		Wapo()
+	}
+except EOFError:
+	sources = {
+		AlJazeera(),
+		Bbc(),
+		Guardian(),
+		Hill(),
+		Wapo()
+	}
+for s in reddit.subreddit('worldnews').hot(limit = 30):
 	if test_in_sites(s.url):
 		title = get_story_title(s.url)
 		stories, opinions = process(title, sources, s.url)
@@ -591,3 +587,4 @@ for mention in reddit.inbox.mentions():
 			else:
 				mention.reply('No matching articles were found')
 '''
+pickle.dump(sources, open('sources.db', 'wb'))
