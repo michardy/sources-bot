@@ -112,7 +112,7 @@ class Bbc(Source):
 					url = urljoin('http://www.bbc.com/news', url)
 				self._process(url, title, desc)
 
-	def update(self):
+	def get(self):
 		self._time = datetime.datetime.utcnow()
 		r = urllib2.urlopen("http://www.bbc.com/news")
 		html = r.read()
@@ -137,7 +137,7 @@ class Guardian(Source):
 				url = urljoin('https://www.theguardian.com', url)
 			self._process(url, title, desc)
 
-	def update(self):
+	def get(self):
 		self._time = datetime.datetime.utcnow()
 		r = urllib2.urlopen("https://www.theguardian.com")
 		html = r.read()
@@ -172,7 +172,7 @@ class Hill(Source):
 				url = urljoin('http://thehill.com/', url)
 			self._process(url, title, desc)
 
-	def update(self):
+	def get(self):
 		self._time = datetime.datetime.utcnow()
 		r = urllib2.urlopen("http://thehill.com/")
 		html = r.read()
@@ -193,7 +193,7 @@ class Wapo(Source):
 				url = urljoin('http://www.washingtonpost.com', url)
 			self._process(url, title, desc)
 
-	def update(self):
+	def get(self):
 		self._time = datetime.datetime.utcnow()
 		r = urllib2.urlopen("http://www.washingtonpost.com")
 		html = r.read()
