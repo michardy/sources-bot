@@ -15,10 +15,10 @@ class Langtree():
 				self.syntax.simplified += ' ' + tokens[child].lemma
 			else:
 				self.syntax.content = (
-					tokens[t].text.content + ' ' + self.syntax.content
+					tokens[child].text.content + ' ' + self.syntax.content
 				)
 				self.syntax.simplified = (
-					tokens[t].lemma + ' ' + self.syntax.simplified
+					tokens[child].lemma + ' ' + self.syntax.simplified
 				)
 			return(self.__branch(child, tokens, processed, ref))
 		else:
