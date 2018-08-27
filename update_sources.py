@@ -102,7 +102,7 @@ class AlJazeera(Source):
 	def get(self):
 		r = urllib2.urlopen("http://www.aljazeera.com/")
 		html = r.read()
-		soup = BeautifulSoup(html, "html.parser")
+		soup = BeautifulSoup(html, "lxml")
 		links = soup.find_all('a')
 		self.__isolate_content(links)
 
@@ -129,7 +129,7 @@ class Bbc(Source):
 		self._time = datetime.datetime.utcnow()
 		r = urllib2.urlopen("http://www.bbc.com/news")
 		html = r.read()
-		soup = BeautifulSoup(html, "html.parser")
+		soup = BeautifulSoup(html, "lxml")
 		links = soup.find_all('div', {'class':'gs-c-promo'})
 		self.__isolate_content(links)
 
@@ -154,7 +154,7 @@ class Guardian(Source):
 		self._time = datetime.datetime.utcnow()
 		r = urllib2.urlopen("https://www.theguardian.com")
 		html = r.read()
-		soup = BeautifulSoup(html, "html.parser")
+		soup = BeautifulSoup(html, "lxml")
 		links = soup.find_all('a', {'class':'js-headline-text'})
 		self.__isolate_content(links)
 
@@ -189,7 +189,7 @@ class Hill(Source):
 		self._time = datetime.datetime.utcnow()
 		r = urllib2.urlopen("http://thehill.com/")
 		html = r.read()
-		soup = BeautifulSoup(html, "html.parser")
+		soup = BeautifulSoup(html, "lxml")
 		links = soup.find_all('a')
 		self.__isolate_content(links)
 
@@ -210,7 +210,7 @@ class Wapo(Source):
 		self._time = datetime.datetime.utcnow()
 		r = urllib2.urlopen("http://www.washingtonpost.com")
 		html = r.read()
-		soup = BeautifulSoup(html, "html.parser")
+		soup = BeautifulSoup(html, "lxml")
 		links = soup.find_all('a', {'data-pb-field':'web_headline'})
 		self.__isolate_content(links)
 
@@ -223,7 +223,7 @@ def get_story_title(url):
 	'''
 	with urllib2.urlopen(url) as p:
 		html = p.read()
-	soup = BeautifulSoup(html, "html.parser")
+	soup = BeautifulSoup(html, "lxml")
 	try:
 		title = soup.find_all('title')[0].contents[0]
 	except IndexError: # untitled site
