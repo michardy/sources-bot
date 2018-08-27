@@ -65,10 +65,17 @@ class Langtree():
 		'''Function to return sentence components of a subset of the sentence.
 		Goes from the root element to the first adapositional clause
 		'''
-		if self.syntax.dependency == enums.PartOfSpeech.Tag.ADP:
+		if self.syntax.tag == enums.PartOfSpeech.Tag.ADP:
 			return(simplified)
-		elif self.syntax.dependency == enums.DependencyEdge.Label.ROOT:
+		elif self.syntax.tag == enums.PartOfSpeech.Tag.VERB:
 			simplified['action'] = self.syntax.simplified
+		elif (
+				self.syntax.dependency == enums.DependencyEdge.Label.ROOT and
+				self.syntax.tag == enums.PartOfSpeech.Tag.NOUN
+			):
+			if self.entity is not None:
+				simplified['target_entity'] = self.entity.id
+			simplified['target'] = self.syntax.lemma
 		elif self.syntax.dependency == enums.DependencyEdge.Label.DOBJ:
 			if self.entity is not None:
 				simplified['target_entity'] = self.entity.id
@@ -94,30 +101,26 @@ class Langtree():
 		'''Get people, places, organizations, actions and other things of signifigance'''
 		if self.entity is not None:
 			if self.entity.type == enums.Entity.Type.LOCATION:
-				if self.syntax.simplified not in r['places']:
-					self.__list_add(r['places'], self.syntax.simplified)
-					if self.entity.id is not None:
-						self.__list_add(r['place_ids'], self.entity.id)
+				self.__list_add(r['places'], self.syntax.simplified)
+				if self.entity.id is not None:
+					self.__list_add(r['place_ids'], self.entity.id)
 			elif self.entity.type == enums.Entity.Type.ORGANIZATION:
-				if self.syntax.simplified not in r['organizations']:
-					self.__list_add(r['organizations'], self.syntax.simplified)
-					if self.entity.id is not None:
-						self.__list_add(r['orgaization_ids'], self.entity.id)
+				self.__list_add(r['organizations'], self.syntax.simplified)
+				if self.entity.id is not None:
+					self.__list_add(r['orgaization_ids'], self.entity.id)
 			elif self.entity.type == enums.Entity.Type.PERSON:
-				if self.syntax.simplified not in r['people']:
-					self.__list_add(r['people'], self.syntax.simplified)
-					if self.entity.id is not None:
-						self.__list_add(r['person_ids'], self.entity.id)
+				self.__list_add(r['people'], self.syntax.simplified)
+				if self.entity.id is not None:
+					self.__list_add(r['person_ids'], self.entity.id)
+			elif self.entity.type == == enums.Entity.Type.OTHER:
+				self.__list_add(r['things'], self.syntax.simplified)
+				if self.entity.id is not None:
+					self.__list_add(r['thing_ids'], self.entity.id)
 		else:
 			if self.syntax.tag == enums.PartOfSpeech.Tag.NOUN:
-				if self.syntax.simplified not in r['things']:
-					self.__list_add(r['things'], self.syntax.simplified)
+				self.__list_add(r['things'], self.syntax.simplified)
 			elif self.syntax.tag == enums.PartOfSpeech.Tag.VERB:
-				if self.syntax.simplified not in r['actions']:
-					self.__list_add(r['actions'], self.syntax.simplified)
-			# needs to be rewritten
-			#elif t.syntax.tag == 'PUNCT':
-			#	r = find_mandatory_words_end(t, n, r)
+				self.__list_add(r['actions'], self.syntax.simplified)
 		for b in self.branches:
 			r = b.get_characteristics(r)
 		return(r)
