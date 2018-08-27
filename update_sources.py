@@ -111,9 +111,9 @@ class Bbc(Source):
 					title = h[0].contents[0].contents[0]
 				else:
 					title = h[0].contents[1].contents[0]
-				d = s.find_all({'class':'gs-c-promo-summary'})
+				d = s.find_all('p', {'class':'gs-c-promo-summary'})
 				if len(d) > 0:
-						desc = d[0].contents[0]
+					desc = d[0].contents[0]
 				url = h[0]['href']
 				if url.startswith('/'):
 					url = urljoin('http://www.bbc.com/news', url)
