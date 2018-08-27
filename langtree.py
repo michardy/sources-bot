@@ -20,6 +20,7 @@ class Langtree():
 				self.syntax.simplified = (
 					tokens[child].lemma + ' ' + self.syntax.simplified
 				)
+			processed[child] = True
 			return(self.__branch(child, tokens, processed, ref))
 		else:
 			return(Langtree(child, tokens, processed, ref))
@@ -31,7 +32,7 @@ class Langtree():
 			if not processed[t]:
 				token = tokens[t]
 				if token.dependency_edge.head_token_index == parent:
-					self.__get_true_children(t, parent, tokens, processed, ref)
+					return(self.__get_true_children(t, parent, tokens, processed, ref))
 			if t < len(processed) - 1:
 				t += 1
 			else:
