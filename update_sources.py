@@ -30,7 +30,7 @@ class Source:
 		query = {
 			"query": {
 				"match": {
-					"url": url
+					"url.keyword": url
 				}
 			}
 		}
@@ -41,8 +41,11 @@ class Source:
 				'title': title,
 				'description': desc,
 				'people': [],
+				'person_ids': [],
 				'places': [],
+				'place_ids': [],
 				'organizations': [],
+				'organization_ids': [],
 				'things': [],
 				'actions': [],
 				'speakers': []
