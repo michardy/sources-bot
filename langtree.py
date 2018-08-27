@@ -75,24 +75,24 @@ class Langtree():
 			):
 			if self.entity is not None:
 				simplified['target_entity'] = self.entity.id
-			simplified['target'] = self.syntax.lemma
+			simplified['target'] = self.syntax.simplified
 		elif self.syntax.dependency == enums.DependencyEdge.Label.DOBJ:
 			if self.entity is not None:
 				simplified['target_entity'] = self.entity.id
-			simplified['target'] = self.syntax.lemma
+			simplified['target'] = self.syntax.simplified
 		elif self.syntax.dependency == enums.DependencyEdge.Label.NSUBJ:
 			if self.entity is not None:
 				simplified['actor_entity'] = self.entity.id
-			simplified['actor'] = self.syntax.lemma
+			simplified['actor'] = self.syntax.simplified
 		elif self.syntax.dependency == enums.DependencyEdge.Label.POSS:
 			if dependency == enums.DependencyEdge.Label.DOBJ:
 				if self.entity is not None:
 					simplified['target_owner_entity'] = self.entity.id
-				simplified['target_owner'] = self.syntax.lemma
+				simplified['target_owner'] = self.syntax.simplified
 			elif dependency == enums.DependencyEdge.Label.NSUBJ:
 				if self.entity is not None:
 					simplified['actor_owner_entity'] = self.entity.id
-				simplified['actor_owner'] = self.syntax.lemma
+				simplified['actor_owner'] = self.syntax.simplified
 		for branch in self.branches:
 			simplified = branch.get_simple_parts(simplified, self.syntax.dependency)
 		return(simplified)
