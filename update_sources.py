@@ -47,6 +47,7 @@ class Source:
 				'organizations': [],
 				'organization_ids': [],
 				'things': [],
+				'thing_ids': [],
 				'actions': [],
 				'speakers': []
 			}
