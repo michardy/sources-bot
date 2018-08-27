@@ -108,7 +108,7 @@ class Langtree():
 			elif self.entity.type == enums.Entity.Type.ORGANIZATION:
 				self.__list_add(r['organizations'], self.syntax.simplified)
 				if self.entity.id is not None:
-					self.__list_add(r['orgaization_ids'], self.entity.id)
+					self.__list_add(r['organization_ids'], self.entity.id)
 			elif self.entity.type == enums.Entity.Type.PERSON:
 				self.__list_add(r['people'], self.syntax.simplified)
 				if self.entity.id is not None:
