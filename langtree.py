@@ -56,7 +56,7 @@ class Langtree():
 			else:
 				self.branches.append(new_branch)
 
-	def __list_add(l, item):
+	def __list_add(self, l, item):
 		'''Set like list add function. Allows us to use JSON serializable lists'''
 		if item not in l:
 			l.add(item)
