@@ -59,7 +59,7 @@ class Langtree():
 	def __list_add(self, l, item):
 		'''Set like list add function. Allows us to use JSON serializable lists'''
 		if item not in l:
-			l.add(item)
+			l.append(item)
 
 	def get_simple_parts(self, simplified, dependency):
 		'''Function to return sentence components of a subset of the sentence.
