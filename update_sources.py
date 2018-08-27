@@ -58,7 +58,7 @@ class Source:
 					ideas.append(sentence.get_simple_parts({}, None))
 					document = sentence.get_characteristics(document)
 			document['ideas'] = ideas
-			es.index(index='stories*', body=document)
+			es.index(index='stories*', body=document, doc_type='_doc')
 
 class AlJazeera(Source):
 	def __isolate_content(self, links):
