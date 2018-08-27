@@ -86,6 +86,8 @@ class AlJazeera(Source):
 							pass
 						except TypeError:
 							pass
+					elif not h.contents[0].contents[0].contents[0].startswith('<'):
+						title = h.contents[0].contents[0].contents[0]
 			except IndexError: # malformed HTML
 				pass
 			try:
@@ -96,7 +98,7 @@ class AlJazeera(Source):
 					url = urljoin('http://www.aljazeera.com/', url)
 			except KeyError: # Yes, here at Al Jazeera we use empty <a> tags!
 				pass
-			if not url.startswith('http') or title == '':
+			if not url.startswith('http') or title == '' or title == '\n':
 				continue
 			self._process(url, title, desc)
 
@@ -122,6 +124,8 @@ class Bbc(Source):
 				if len(d) > 0:
 					desc = d[0].contents[0]
 				url = h[0]['href']
+				if url == '/radio/player/bbc_world_service' or url == '/news/world_radio_and_tv':
+					continue
 				if url.startswith('/'):
 					url = urljoin('http://www.bbc.com/news', url)
 				self._process(url, title, desc)
