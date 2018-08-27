@@ -7,8 +7,8 @@ class Langtree():
 	def __get_true_children(self, child, parent, tokens, processed, ref):
 		'''Checks that the next nodes are not just chained nouns
 		If they are chained then add the chained contents and link the next element'''
-		if (token.dependency_edge.label == enums.DependencyEdge.Label.NN or
-			token.dependency_edge.label == enums.DependencyEdge.Label.APPOS):
+		if (tokens[child].dependency_edge.label == enums.DependencyEdge.Label.NN or
+			tokens[child].dependency_edge.label == enums.DependencyEdge.Label.APPOS):
 			assert(parent != child, 'Self referential non root node')
 			if parent < child:
 				self.syntax.content += ' ' + tokens[child].text.content
