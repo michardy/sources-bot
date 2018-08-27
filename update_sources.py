@@ -84,6 +84,8 @@ class AlJazeera(Source):
 					url = urljoin('http://www.aljazeera.com/', url)
 			except KeyError: # Yes, here at Al Jazeera we use empty <a> tags!
 				pass
+			if not url.startswith('http') or title == '':
+				continue
 			self._process(url, title, desc)
 
 	def get(self):
