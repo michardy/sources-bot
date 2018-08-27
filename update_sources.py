@@ -83,6 +83,8 @@ class AlJazeera(Source):
 				pass
 			try:
 				url = h['href']
+				if url.startswith('/topics'):
+					continue
 				if url.startswith('/'):
 					url = urljoin('http://www.aljazeera.com/', url)
 			except KeyError: # Yes, here at Al Jazeera we use empty <a> tags!
