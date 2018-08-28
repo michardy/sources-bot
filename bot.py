@@ -86,6 +86,19 @@ def get_query(attributes):
 		query["query"]["bool"]["should"].append(match)
 	return(query)
 
+
+def test_in_sites(url):
+	'''Checks if the input story is from an acceptable site.
+	For example this will not return true for:
+	https://entertainment.theonion.com/showrunner-disappointed-world-will-never-see-episode-wh-1826423126
+	But will return true for:
+	https://www.nytimes.com/2018/05/29/opinion/roseanne-canceled-abc-racist-tweets.html
+	'''
+	for s in SITES:
+		if s in url:
+			return(True)
+	return(False)
+
 for s in reddit.subreddit('worldnews').hot(limit = 30):
 	if test_in_sites(s.url):
 		title = get_story_title(s.url)
