@@ -20,6 +20,7 @@ SITES = [
 	'bloomberg.com/news', # US financial news service
 	'breitbart.com', # US conservative news commentary site
 	'businessinsider.com', # US financial news company
+	'businessinsider.in', # US financial news company (India page)
 	'cbc.ca/news', # Canadian Broadcasting Service
 	'cbslocal.com', # * CBS local affiliates (US local)
 	'cbsnews.com', # US broadcaster
@@ -55,6 +56,7 @@ SITES = [
 	'newyorker.com/news', # US magazine (based in New York)
 	'npr.org', # National Public Radio (US not for profit broadcaster)
 	'nytimes.com', # New York Times (US newspaper)
+	'pakthought.com', # Pakistani news analysis
 	'pbs.org/newshour', # PBS NewsHour (US news show)
 	'en.people.cn', # People's Daily (State run, China)
 	'politico.com', # US news magazine
