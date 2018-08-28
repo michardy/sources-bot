@@ -111,4 +111,4 @@ for s in reddit.subreddit('worldnews').hot(limit = 30):
 		res = es.search(index='stories*', body=query)
 		print(title)
 		for r in res['hits']['hits']:
-			print(r['title'])
+			print(r['_source']]['title'])
