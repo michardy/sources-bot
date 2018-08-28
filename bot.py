@@ -100,6 +100,19 @@ def test_in_sites(url):
 			return(True)
 	return(False)
 
+def template_links(stories):
+	out = ''
+	urls = []
+	n = 0
+	for s in reversed(sorted(stories, key=lambda k: k['score'])):
+		if s['url'] not in urls:
+			n += 1
+			out += '{n}. [{title}]({url}) ({score})\n'.format(
+				n=str(n), title=s["title"], url=s["url"], score=str(s["score"])
+			)
+			urls.append(s['url'])
+	return(out)
+
 for s in reddit.subreddit('worldnews').hot(limit = 30):
 	if test_in_sites(s.url):
 		title = get_story_title(s.url)
@@ -109,6 +122,45 @@ for s in reddit.subreddit('worldnews').hot(limit = 30):
 			)
 		)
 		res = es.search(index='stories*', body=query)
-		print(title)
+		stories = []
+		opinions = []
 		for r in res['hits']['hits']:
-			print(r['_source']['title'])
+			if r['_score'] > 6:
+				if (
+					'/opinion/' in url or
+					'/opinions/' in url or
+					'/blogs/' in url or
+					'/commentisfree/' in url or
+					'/posteverything/' in url
+				):
+					opinions.append({
+						'url': r['_source']['url'],
+						'title': r['_source']['title'],
+						'score': r['_score']
+					})
+				else:
+					stories.append({
+						'url': r['_source']['url'],
+						'title': r['_source']['title'],
+						'score': r['_score']
+					})
+		temp = Template(TEMPLATE)
+		articles = template_links(stories)
+		editorials = template_links(opinions)
+		print(title)
+		print(
+			temp.substitute(
+				sources=articles,
+				opinions=editorials,
+				writer='/u/michaelh115',
+				code='https://github.com/michardy/sources-bot'
+			)
+		)
+		#s.reply(
+		#	temp.substitute(
+		#		sources=articles,
+		#		opinions=editorials,
+		#		writer='/u/michaelh115',
+		#		code='https://github.com/michardy/sources-bot'
+		#	)
+		#)
