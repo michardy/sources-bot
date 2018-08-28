@@ -82,7 +82,7 @@ def get_query(attributes):
 	}
 	for attribute in attributes:
 		for component in attributes[attribute]:
-			if attribute is in ['people', 'person_ids', 'places', 'place_ids']:
+			if attribute in ['people', 'person_ids', 'places', 'place_ids']:
 				boost = 2
 			else:
 				boost = 1
