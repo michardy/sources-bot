@@ -60,12 +60,12 @@ class Source:
 
 			machine_title = annotator.annotate(title)
 			for sentence in machine_title:
-				ideas.append(sentence.get_simple_parts({}, None))
+				ideas.append(sentence.get_simple_parts({}, None, False))
 				document = sentence.get_characteristics(document)
 			if desc is not None:
 				machine_desc = annotator.annotate(desc)
 				for sentence in machine_desc:
-					ideas.append(sentence.get_simple_parts({}, None))
+					ideas.append(sentence.get_simple_parts({}, None, False))
 					document = sentence.get_characteristics(document)
 			document['ideas'] = ideas
 			es.index(index='<stories{now{YYYY-MM-dd}}>', body=document, doc_type='_doc')

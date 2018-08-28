@@ -62,14 +62,32 @@ class Langtree():
 		if item not in l:
 			l.append(item)
 
-	def get_simple_parts(self, simplified, dependency):
+	def get_simple_parts(self, simplified, dependency, acted):
 		'''Function to return sentence components of a subset of the sentence.
 		Goes from the root element to the first adapositional clause
 		'''
 		if self.syntax.tag == enums.PartOfSpeech.Tag.ADP:
 			return(simplified)
 		elif self.syntax.tag == enums.PartOfSpeech.Tag.VERB:
-			simplified['action'] = self.syntax.simplified
+			if not acted:
+				simplified['action'] = self.syntax.simplified
+			else:
+				# only store two layers of nested actions
+				if 'target_action' in simplified:
+					simplified['action'] = simplified['target_action']
+				simplified['target_action'] = self.syntax.simplified
+			acted = True
+		elif self.syntax.tag == enums.PartOfSpeech.Tag.ADJ:
+			if dependency == enums.DependencyEdge.Label.DOBJ:
+				if 'target_modifiers' in simplified:
+					simplified['target_modifiers'].append(self.syntax.simplified)
+				else:
+					simplified['target_modifiers'] = [self.syntax.simplified]
+			elif dependency == enums.DependencyEdge.Label.NSUBJ:
+				if 'actor_modifiers' in simplified:
+					simplified['actor_modifiers'].append(self.syntax.simplified)
+				else:
+					simplified['actor_modifiers'] = [self.syntax.simplified]
 		elif (
 				self.syntax.dependency == enums.DependencyEdge.Label.ROOT and
 				self.syntax.tag == enums.PartOfSpeech.Tag.NOUN
@@ -95,7 +113,7 @@ class Langtree():
 					simplified['actor_owner_entity'] = self.entity.id
 				simplified['actor_owner'] = self.syntax.simplified
 		for branch in self.branches:
-			simplified = branch.get_simple_parts(simplified, self.syntax.dependency)
+			simplified = branch.get_simple_parts(simplified, self.syntax.dependency, acted)
 		return(simplified)
 
 	def get_characteristics(self, r):
