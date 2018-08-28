@@ -78,10 +78,10 @@ def get_query(attributes):
 		}
 	}
 	for attribute in attributes:
-		if len(attributes[attribute]) > 0:
+		for component in attribute:
 			match = {
 				"match": {
-					attribute: attributes[attribute]
+					attribute: component
 				}
 			}
 			query["query"]["bool"]["should"].append(match)
