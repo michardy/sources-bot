@@ -78,7 +78,7 @@ def get_query(attributes):
 		}
 	}
 	for attribute in attributes:
-		for component in attribute:
+		for component in attributes[attribute]:
 			match = {
 				"match": {
 					attribute: component
