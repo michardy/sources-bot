@@ -19,8 +19,11 @@ annotator = Annotator()
 es = Elasticsearch()
 
 TEMPLATE = '''Other sources for this story:
+
 $sources
+
 Opinions:
+
 $opinions
 __________
 ^(*Note on opinions: due to sourcing and how articles are matched the opinions may not be terribly diverse.*)
@@ -125,7 +128,7 @@ for s in reddit.subreddit('worldnews').hot(limit = 30):
 		stories = []
 		opinions = []
 		for r in res['hits']['hits']:
-			if r['_score'] > 6:
+			if r['_score'] > 6 and r['_source']['url'] != s.url:
 				if (
 					'/opinion/' in r['_source']['url'] or
 					'/opinions/' in r['_source']['url'] or
