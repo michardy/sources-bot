@@ -147,20 +147,22 @@ for s in reddit.subreddit('worldnews').hot(limit = 30):
 		temp = Template(TEMPLATE)
 		articles = template_links(stories)
 		editorials = template_links(opinions)
-		print(title)
-		print(
-			temp.substitute(
-				sources=articles,
-				opinions=editorials,
-				writer='/u/michaelh115',
-				code='https://github.com/michardy/sources-bot'
+		if len(stories) > 0 or len(opinions) > 0:
+			print(title)
+			print(
+				temp.substitute(
+					sources=articles,
+					opinions=editorials,
+					writer='/u/michaelh115',
+					code='https://github.com/michardy/sources-bot'
+				)
 			)
-		)
-		#s.reply(
-		#	temp.substitute(
-		#		sources=articles,
-		#		opinions=editorials,
-		#		writer='/u/michaelh115',
-		#		code='https://github.com/michardy/sources-bot'
-		#	)
-		#)
+			print()
+			#s.reply(
+			#	temp.substitute(
+			#		sources=articles,
+			#		opinions=editorials,
+			#		writer='/u/michaelh115',
+			#		code='https://github.com/michardy/sources-bot'
+			#	)
+			#)
