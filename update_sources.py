@@ -220,28 +220,6 @@ class Wapo(Source):
 		links = soup.find_all('a', {'data-pb-field':'web_headline'})
 		self.__isolate_content(links)
 
-def get_story_title(url):
-	'''Remove the little trailing bits that websites add to article titles.
-	for example:
-	Andrew McCabe turned over memo on Comey firing to Mueller - CNNPolitics
-	becomes:
-	Andrew McCabe turned over memo on Comey firing to Mueller
-	'''
-	with urllib2.urlopen(url) as p:
-		html = p.read()
-	soup = BeautifulSoup(html, "lxml")
-	try:
-		title = soup.find_all('title')[0].contents[0]
-	except IndexError: # untitled site
-		title = ''
-	if '|' in title:
-		title = title.split('|')[0]
-	elif ' - ' in title:
-		title = title.split(' - ')[0]
-	elif '«' in title:
-		title = title.split('«')[0]
-	return(title)
-
 sources = {
 	AlJazeera(),
 	Bbc(),
