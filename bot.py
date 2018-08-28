@@ -127,11 +127,11 @@ for s in reddit.subreddit('worldnews').hot(limit = 30):
 		for r in res['hits']['hits']:
 			if r['_score'] > 6:
 				if (
-					'/opinion/' in url or
-					'/opinions/' in url or
-					'/blogs/' in url or
-					'/commentisfree/' in url or
-					'/posteverything/' in url
+					'/opinion/' in r['_source']['url'] or
+					'/opinions/' in r['_source']['url'] or
+					'/blogs/' in r['_source']['url'] or
+					'/commentisfree/' in r['_source']['url'] or
+					'/posteverything/' in r['_source']['url']
 				):
 					opinions.append({
 						'url': r['_source']['url'],
