@@ -82,9 +82,16 @@ def get_query(attributes):
 	}
 	for attribute in attributes:
 		for component in attributes[attribute]:
+			if attribute is in ['people', 'person_ids', 'places', 'place_ids']:
+				boost = 2
+			else:
+				boost = 1
 			match = {
 				"match": {
-					attribute: component
+					attribute: {
+						"query": component,
+						"boost": boost
+					}
 				}
 			}
 			query["query"]["bool"]["should"].append(match)
