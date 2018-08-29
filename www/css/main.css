@@ -1,0 +1,108 @@
+body {
+	overflow-x: hidden;
+	display: grid;
+	width:100%;
+	grid-template-columns: repeat(4, 24.7%);
+	grid-auto-rows: minmax(100px, auto);
+}
+
+header {
+	grid-column: 1 / 4;
+	grid-row: 1;
+	padding-bottom:15px;
+}
+
+header h1 a {
+	text-decoration:none;
+}
+
+main.article {
+	grid-column: 2 / 4;
+	grid-row:2;
+}
+
+main.search {
+	position: relative;
+	grid-column: 1 / 5;
+	grid-row: 3;
+	text-align: center;
+	min-width: 50%;
+}
+
+#searchform {
+	position: absolute;
+	min-width: 50%;
+	right: 50%;
+	transform: translate(50%)
+}
+
+footer {
+	grid-column: 1 / 5;
+	grid-row: 6;
+	text-align: center;
+}
+
+.navbar {
+	display:inline;
+}
+
+h1 {
+	font-family: monospace;
+}
+
+h2, h3, h4, h5, h6 {
+	font-family:sans-serif;
+}
+
+pre {
+	background-color: #eee;
+}
+
+table {
+	border: 1px solid black;
+}
+
+td {
+	border: 1px solid black;
+}
+
+.outer {
+	border: 2px solid black;
+}
+
+.fatradio-button {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	size: 0px;
+}
+
+.fatradio-button+label {
+	border: 1px solid black;
+	background-color: lightgray;
+	padding-left: 5px;
+	padding-right: 5px;
+	white-space: nowrap;
+}
+
+#tabbar {
+	white-space: nowrap;
+}
+
+.fatradio-button:checked+label {
+	border-top: 1px solid black;
+	border-left: 1px solid black;
+	border-right: 1px solid black;
+	border-bottom: 1px solid white;
+	background-color: white;
+}
+
+#searcharea {
+	padding-top: 5px;
+	padding-bottom: 5px;
+	border: 1px solid black;
+}
+
+#searchbox {
+	width: 75%;
+}
