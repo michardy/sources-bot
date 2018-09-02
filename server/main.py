@@ -3,8 +3,11 @@ sys.path.append("..")
 
 from indexer import indexer
 
+from elasticsearch import Elasticsearch
 import tornado.ioloop
 import tornado.web
+
+es = Elasticsearch()
 
 def get_query(document):
 	query = {
