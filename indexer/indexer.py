@@ -85,7 +85,7 @@ async def create_document(index, url=None, title=None, description=None, refresh
 	if refresh:
 		es.refresh(res['_index'])
 	return({
-		'index': res['_index']
+		'index': res['_index'],
 		'id': res['_id']
 	})
 
