@@ -17,7 +17,7 @@ except ImportError:
 	from urllib.parse import urljoin
 
 from news import *
-from annotator import Annotator
+from annotator.annotator import Annotator
 
 annotator = Annotator()
 es = Elasticsearch()

@@ -5,8 +5,8 @@ from google.cloud.language import types
 import datetime
 import time
 
-from entity import Entity
-from langtree import Langtree # syntax is used here
+from annotator.entity import Entity
+from annotator.langtree import Langtree # syntax is used here
 
 client = language.LanguageServiceClient()
 

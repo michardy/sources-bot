@@ -1,4 +1,4 @@
-from syntax import Syntax
+from annotator.syntax import Syntax
 from google.cloud.language import enums
 
 class Langtree():
