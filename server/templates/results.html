@@ -41,40 +41,40 @@
 		<main class="text">
 			<div class="article">
 				<h2>
-					{% if query.url is not None %}
-					<a href="{{ query.url }}">{{ query.title }}</a>
+					{% if query['url']' is not None %}
+					<a href="{{ query.url }}">{{ query['title'] }}</a>
 					{% else %}
-					{{ query.title }}
+					{{ query['title'] }}
 					{% end %}
 				</h2>
-				{% if query.type is not None %}
-				<div>{{ result.type }}</div>
+				{% if query['type'] is not None %}
+				<div>{{ query['type'] }}</div>
 				{% end %}
-				<div>{{ query.description }}</div>
+				<div>{{ query['description'] }}</div>
 				<div class="spoiler">
 					<h3 class="spoiler-title">Match Terms</h3>
 					<div class="spoiler-content">
 						<h4>People:</h4>
 						<ul>
-							{% for person in query.people %}
+							{% for person in query['people'] %}
 							<li>{{ person }}</li>
 							{% end %}
 						</ul>
 						<h4>Places:</h4>
 						<ul>
-							{% for place in query.places %}
+							{% for place in query['places'] %}
 							<li>{{ place }}</li>
 							{% end %}
 						</ul>
 						<h4>Organizations:</h4>
 						<ul>
-							{% for organization in query.organizations %}
+							{% for organization in query['organizations'] %}
 							<li>{{ organization }}</li>
 							{% end %}
 						</ul>
 						<h4>Actions:</h4>
 						<ul>
-							{% for action in query.actions %}
+							{% for action in query['actions'] %}
 							<li>{{ action }}</li>
 							{% end %}
 						</ul>
@@ -85,35 +85,35 @@
 				<ul>
 					{% for result in results %}
 					<li class="article">
-						<h3><a href="{{ query.url }}">{{ result.title }}</a></h3>
-						{% if result.type is not None %}
-						<div>{{ result.type }}</div>
+						<h3><a href="{{ query.url }}">{{ result['title'] }}</a></h3>
+						{% if result['type'] is not None %}
+						<div>{{ result['type'] }}</div>
 						{% end %}
-						<div>{{ result.description }}</div>
+						<div>{{ result['description'] }}</div>
 						<div class="spoiler">
 							<h4 class="spoiler-title">Match Terms</h4>
 							<div class="spoiler-content">
 								<h5>People:</h5>
 								<ul>
-									{% for person in result.people %}
+									{% for person in result['people'] %}
 									<li>{{ person }}</li>
 									{% end %}
 								</ul>
 								<h5>Places:</h5>
 								<ul>
-									{% for place in result.places %}
+									{% for place in result['places'] %}
 									<li>{{ place }}</li>
 									{% end %}
 								</ul>
 								<h5>Organizations:</h5>
 								<ul>
-									{% for organization in result.organizations %}
+									{% for organization in result['organizations'] %}
 									<li>{{ organization }}</li>
 									{% end %}
 								</ul>
 								<h5>Actions:</h5>
 								<ul>
-									{% for action in result.actions %}
+									{% for action in result['actions'] %}
 									<li>{{ action }}</li>
 									{% end %}
 								</ul>
