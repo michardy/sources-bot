@@ -16,7 +16,7 @@ header h1 a {
 	text-decoration:none;
 }
 
-main.article {
+main.text {
 	grid-column: 2 / 4;
 	grid-row:2;
 }
@@ -87,6 +87,7 @@ td {
 
 #tabbar {
 	white-space: nowrap;
+	z-index: 2;
 }
 
 .fatradio-button:checked+label {
@@ -101,8 +102,13 @@ td {
 	padding-top: 5px;
 	padding-bottom: 5px;
 	border: 1px solid black;
+	z-index: 1;
 }
 
 #searchbox {
 	width: 75%;
+}
+
+.article {
+	border: 1px solid grey;
 }

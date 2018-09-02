@@ -28,7 +28,6 @@
 		<meta name="google-site-verification" content="gIHQtM45_n6R22KdZf2S9Ech18XHwLsJwbYuPoFbo1Q" />
 		<!--And now for the actual standard that everyone seems to need their own version of (Facebook, Twitter, Google):-->
 		<title>Sources Bot</title>
-		<meta name="author" content="Michael Hardy">
 		<meta name="description" content="A system to find alterate sources for news stories"/>
 	</head>
 	<body>
@@ -36,30 +35,31 @@
 			<h1><a href="/">Sources Bot</a></h1>
 			<a class="navbar" href="">About</a>&nbsp;
 			<a class="navbar" href="https://github.com/michardy/sources-bot">Code</a>&nbsp;
+			<a class="navbar" href="https://reddit.com/r/sourcesbot">Subreddit</a>&nbsp;
+			<a class="navbar" href="https://reddit.com/u/sourcesbot">Reddit Bot</a>&nbsp;
 		</heading>
-		<main class="article">
+		<main class="text">
 			<h2>About</h2>
 			<article>
-				Sources Bot is a peice of software build to find similar news articles across a variety of sources.
+				Sources Bot is a peice of software built to find similar news articles across a variety of sources.
 				The hope is that through providing this resource I can help reduce the effect of online echochambers.
 			</article>
-			<h2>How it works</h2>
+			<h2>How it Works</h2>
 			<article>
-				Sources Bot is a peice of software build to find similar news articles across a variety of sources.
-				The hope is that through providing this resource I can help reduce the effect of online echochambers.
+				Sources Bot works by tagging nouns and verbs in article titles and descriptions and searching for siminalr documents across a database of tagged articles.
 			</article>
 			<h2>Caviats</h2>
 			<article>
 				<h3>The Importance of Fact</h3>
-				While understanding different political opinions is increasingly important in today's political climate, so is responsible reporting and factual accuracy.
-				This means ensuring the factual accuracy of news articles but also in some cases editorials.
-				I will not promote or suggest sources that:
+				While understanding different political opinions is increasingly important in today's political climate, so are responsible reporting and factual accuracy.
+				This means not only ensuring the factual accuracy of news articles but also in some cases opinion peices.
+				In order to ensure I am responsibly desseminating information I will not promote or suggest sources that:
 				<ul>
 					<li>Promote or sanction acts of violence</li>
 					<li>Question the science on Climate Change or Vaccines</li>
 					<li>Knowingfully tell demonstrable untruths</li>
 				</ul>
-				As a side effect of this I cannot run the following news sources:
+				As a side effect of this Sources Bot does not suggest the following news sources:
 				<table>
 					<tr>
 						<th>Outlet</th>
@@ -87,15 +87,18 @@
 						<td>Demonstrably false accusations about the Sandy Hook shooting.</td>
 					</tr>
 				</table>
+				In addition to these sites I also try to avoid outlets arguably producing propaganda (for example: The People's Daily, Voice of America, and Sputnik) but as of right now I do not have a consistant policy on this issue.  
 				<h3>Closed Access News Sites</h3>
-				Additionally I do not promote the Wall Street Journal because its access model means that only subscribers
-				(Mostly those already holding its opinions) can read it.
+				Some other sites are not searched by Sources Bot simply because their pricing models render them inaccessable to many people intereseted in broadening their media consumption.
+				For this reason I do not provide links to the Wall Street Journal.
+				This is not to say that you should not read the Wall Street Journal.
+				The Journal is a great publication if you wish to better understand American conservative views.
 				If the Wall Street Journal changes its policies to be more friendly to new or occasional readers I will reverse this decision.
 			</article>
 		</main>
 		<footer>
 			<div>
-				&copy; 2017 Michael Hardy
+				&copy; 2018 Michael Hardy
 			</div>
 		</footer>
 		<script src="js/main.js"></script>

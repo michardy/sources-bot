@@ -28,7 +28,6 @@
 		<meta name="google-site-verification" content="gIHQtM45_n6R22KdZf2S9Ech18XHwLsJwbYuPoFbo1Q" />
 		<!--And now for the actual standard that everyone seems to need their own version of (Facebook, Twitter, Google):-->
 		<title>Sources Bot</title>
-		<meta name="author" content="Michael Hardy">
 		<meta name="description" content="A system to find alterate sources for news stories"/>
 	</head>
 	<body>
@@ -36,8 +35,11 @@
 			<h1><a href="/">Sources Bot</a></h1>
 			<a class="navbar" href="about.html">About</a>&nbsp;
 			<a class="navbar" href="https://github.com/michardy/sources-bot">Code</a>&nbsp;
+			<a class="navbar" href="https://reddit.com/r/sourcesbot">Subreddit</a>&nbsp;
+			<a class="navbar" href="https://reddit.com/u/sourcesbot">Reddit Bot</a>&nbsp;
 		</heading>
 		<main class="search">
+			<h2>Find Similar Articles:</h2>
 			<form id="searchform" action="/interactive/search" method="POST">
 				<div id="tabbar">
 					<span>Search by:</span>
@@ -47,14 +49,14 @@
 					<label for="titleselector">article title</label>
 				</div>
 				<div id="searcharea">
-					<input id="searchbox" type="text" placeholder="URL or article title" name="url"></input>
+					<input id="searchbox" type="text" placeholder="URL or article title" name="query"></input>
 					<button>Search</button>
 				</div>
 			</form>
 		</main>
 		<footer>
 			<div>
-				&copy; 2017 Michael Hardy
+				&copy; 2018 Michael Hardy
 			</div>
 		</footer>
 		<script src="js/main.js"></script>
