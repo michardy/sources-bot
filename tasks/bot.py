@@ -150,7 +150,7 @@ for s in reddit.subreddit('worldnews').hot(limit = 30):
 			articles = template_links(stories)
 			editorials = template_links(opinions)
 			if len(stories) > 0 or len(opinions) > 0:
-				print(results['hits']['hits'][0]['_source']['title'])
+				print(articles['hits']['hits'][0]['_source']['title'])
 				print(
 					temp.substitute(
 						sources=articles,
