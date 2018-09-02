@@ -36,46 +36,7 @@ TEMPLATE_NFOUND = '''No acceptable matches were found
 __________
 ^*[feedback](https://www.reddit.com/r/sourcesbot/comments/6v0pa5/feedback/)* ^| ^*[usage](https://www.reddit.com/r/sourcesbot/wiki/index)* ^| ^*[code]($code)* ^| ^*author:* ^*$writer*'''
 
-def get_story_title(url):
-	'''Remove the little trailing bits that websites add to article titles.
-	for example:
-	Andrew McCabe turned over memo on Comey firing to Mueller - CNNPolitics
-	becomes:
-	Andrew McCabe turned over memo on Comey firing to Mueller
-	'''
-	with urllib2.urlopen(url) as p:
-		html = p.read()
-	soup = BeautifulSoup(html, "lxml")
-	try:
-		title = soup.find_all('title')[0].contents[0]
-	except IndexError: # untitled site
-		title = ''
-	if '|' in title:
-		title = title.split('|')[0]
-	elif ' - ' in title:
-		title = title.split(' - ')[0]
-	elif '«' in title:
-		title = title.split('«')[0]
-	return(title)
-
-def get_attributes(machine_title):
-	document = {
-		'people': [],
-		'person_ids': [],
-		'places': [],
-		'place_ids': [],
-		'organizations': [],
-		'organization_ids': [],
-		'things': [],
-		'thing_ids': [],
-		'actions': [],
-		'speakers': []
-	}
-	for sentence in machine_title:
-		document = sentence.get_characteristics(document)
-	return(document)
-
-def get_query(attributes):
+def get_query(document):
 	query = {
 		"query": {
 			"bool": {
@@ -83,15 +44,27 @@ def get_query(attributes):
 			}
 		}
 	}
-	for attribute in attributes:
-		for component in attributes[attribute]:
-			if attribute in ['people', 'person_ids', 'places', 'place_ids']:
+	keys = [
+		'person_ids',
+		'organizations',
+		'actions',
+		'places',
+		'thing_ids',
+		'place_ids',
+		'organization_ids',
+		'things',
+		'people',
+		'speakers'
+	]
+	for key in keys:
+		for component in document[key]:
+			if key in ['people', 'person_ids', 'places', 'place_ids']:
 				boost = 2
 			else:
 				boost = 1
 			match = {
 				"match": {
-					attribute: {
+					key: {
 						"query": component,
 						"boost": boost
 					}
@@ -128,54 +101,59 @@ def template_links(stories):
 
 for s in reddit.subreddit('worldnews').hot(limit = 30):
 	if test_in_sites(s.url):
-		title = get_story_title(s.url)
-		query = get_query(
-			get_attributes(
-				annotator.annotate(title)
-			)
-		)
-		res = es.search(index='stories*', body=query)
-		stories = []
-		opinions = []
-		for r in res['hits']['hits']:
-			if r['_score'] > 6 and r['_source']['url'] != s.url:
-				if (
-					'/opinion/' in r['_source']['url'] or
-					'/opinions/' in r['_source']['url'] or
-					'/blogs/' in r['_source']['url'] or
-					'/commentisfree/' in r['_source']['url'] or
-					'/posteverything/' in r['_source']['url']
-				):
-					opinions.append({
-						'url': r['_source']['url'],
-						'title': r['_source']['title'],
-						'score': r['_score']
-					})
-				else:
-					stories.append({
-						'url': r['_source']['url'],
-						'title': r['_source']['title'],
-						'score': r['_score']
-					})
-		temp = Template(TEMPLATE)
-		articles = template_links(stories)
-		editorials = template_links(opinions)
-		if len(stories) > 0 or len(opinions) > 0:
-			print(title)
-			print(
-				temp.substitute(
-					sources=articles,
-					opinions=editorials,
-					writer='/u/michaelh115',
-					code='https://github.com/michardy/sources-bot'
+		doc_id = await(indexer.index('user-stories', url=s.url, refresh=True))
+		query = {
+			"query": {
+				"match": {
+					"_id": doc_id['id']
+				}
+			}
+		}
+		articles = es.search(index=doc_id['index'], body=query)
+		if articles['hits']['total'] > 0:
+			query = get_query(articles['hits']['hits'][0]['_source'])
+			results = es.search(index="stories*", body=query)
+			stories = []
+			opinions = []
+			for r in results['hits']['hits']:
+				if r['_score'] > 6 and r['_source']['url'] != s.url:
+					if (
+						'/opinion/' in r['_source']['url'] or
+						'/opinions/' in r['_source']['url'] or
+						'/blogs/' in r['_source']['url'] or
+						'/commentisfree/' in r['_source']['url'] or
+						'/posteverything/' in r['_source']['url']
+					):
+						opinions.append({
+							'url': r['_source']['url'],
+							'title': r['_source']['title'],
+							'score': r['_score']
+						})
+					else:
+						stories.append({
+							'url': r['_source']['url'],
+							'title': r['_source']['title'],
+							'score': r['_score']
+						})
+			temp = Template(TEMPLATE)
+			articles = template_links(stories)
+			editorials = template_links(opinions)
+			if len(stories) > 0 or len(opinions) > 0:
+				print(title)
+				print(
+					temp.substitute(
+						sources=articles,
+						opinions=editorials,
+						writer='/u/michaelh115',
+						code='https://github.com/michardy/sources-bot'
+					)
 				)
-			)
-			print()
-			#s.reply(
-			#	temp.substitute(
-			#		sources=articles,
-			#		opinions=editorials,
-			#		writer='/u/michaelh115',
-			#		code='https://github.com/michardy/sources-bot'
-			#	)
-			#)
+				print()
+				#s.reply(
+				#	temp.substitute(
+				#		sources=articles,
+				#		opinions=editorials,
+				#		writer='/u/michaelh115',
+				#		code='https://github.com/michardy/sources-bot'
+				#	)
+				#)
