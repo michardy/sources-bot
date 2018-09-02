@@ -120,9 +120,9 @@ for s in reddit.subreddit('worldnews').hot(limit = 30):
 				}
 			}
 		}
-		articles = es.search(index=doc_id['index'], body=query)
-		if articles['hits']['total'] > 0:
-			query = get_query(articles['hits']['hits'][0]['_source'])
+		queries = es.search(index=doc_id['index'], body=query)
+		if queries['hits']['total'] > 0:
+			query = get_query(queries['hits']['hits'][0]['_source'])
 			results = es.search(index="stories*", body=query)
 			stories = []
 			opinions = []
@@ -150,7 +150,7 @@ for s in reddit.subreddit('worldnews').hot(limit = 30):
 			articles = template_links(stories)
 			editorials = template_links(opinions)
 			if len(stories) > 0 or len(opinions) > 0:
-				print(articles['hits']['hits'][0]['_source']['title'])
+				print(queries['hits']['hits'][0]['_source']['title'])
 				print(
 					temp.substitute(
 						sources=articles,
