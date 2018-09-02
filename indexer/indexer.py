@@ -99,7 +99,7 @@ async def index_by_url(index, url, title=None, description=None, refresh=False):
 	}
 	search = es.search(index="*stories*", body=query)
 	if search['hits']['total'] == 0:
-		create_document('stories', url, title, description, refresh)
+		return(await(create_document('stories', url, title, description, refresh))
 	else:
 		return({
 			'index': search['hits']['hits'][0]['_source']['_index'],
@@ -117,7 +117,7 @@ async def index_by_title(index, title, description=None, refresh=False):
 	}
 	search = es.search(index="*stories*", body=query)
 	if search['hits']['total'] == 0:
-		create_document('stories', None, title, description, refresh
+		return(await(create_document('stories', None, title, description, refresh)))
 	else:
 		return({
 			'index': search['hits']['hits'][0]['_source']['_index'],
