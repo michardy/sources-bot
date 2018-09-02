@@ -38,7 +38,7 @@ class Source:
 				}
 			}
 		}
-		if es.search(index="stories*", body=query)['hits']['total'] == 0:
+		if es.search(index="*stories*", body=query)['hits']['total'] == 0:
 			document = {
 				'url': url,
 				'timestamp': time,
