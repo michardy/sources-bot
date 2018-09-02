@@ -42,7 +42,7 @@
 			<div class="article">
 				<h2>
 					{% if query['url'] is not None %}
-					<a href="{{ query.url }}">{{ query['title'] }}</a>
+					<a href="{{ query['url'] }}">{{ query['title'] }}</a>
 					{% else %}
 					{{ query['title'] }}
 					{% end %}
@@ -85,7 +85,7 @@
 				<ul>
 					{% for result in results %}
 					<li class="article">
-						<h3><a href="{{ query.url }}">{{ result['title'] }}</a></h3>
+						<h3><a href="{{ result['url'] }}">{{ result['title'] }}</a></h3>
 						{% if result['type'] is not None %}
 						<div>{{ result['type'] }}</div>
 						{% end %}
