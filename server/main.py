@@ -49,11 +49,14 @@ def get_query(document):
 def create_display_dict(hit):
 	story = {}
 	if (
-		'/opinion/' in hit['_source']['url'] or
-		'/opinions/' in hit['_source']['url'] or
-		'/blogs/' in hit['_source']['url'] or
-		'/commentisfree/' in hit['_source']['url'] or
-		'/posteverything/' in hit['_source']['url']
+		hit['_source']['url'] is not None and
+		(
+			'/opinion/' in hit['_source']['url'] or
+			'/opinions/' in hit['_source']['url'] or
+			'/blogs/' in hit['_source']['url'] or
+			'/commentisfree/' in hit['_source']['url'] or
+			'/posteverything/' in hit['_source']['url']
+		)
 	):
 		story['type'] = 'Opinion'
 	else:
