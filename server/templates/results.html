@@ -52,7 +52,8 @@
 				{% end %}
 				<div>{{ query['description'] }}</div>
 				<div class="spoiler">
-					<h3 class="spoiler-title">Match Terms</h3>
+					<input class="spoiler-button" type="checkbox" id="queryspoiler"></input>
+					<label for="queryspoiler"><h3 class="spoiler-title">Match Terms</h3></label>
 					<div class="spoiler-content">
 						<h4>People:</h4>
 						<ul>
@@ -83,6 +84,7 @@
 			</div>
 			<output>
 				<ul>
+					{% set spoiler_num = 0 %}
 					{% for result in results %}
 					<li class="article">
 						<h3><a href="{{ result['url'] }}">{{ result['title'] }}</a></h3>
@@ -91,7 +93,8 @@
 						{% end %}
 						<div>{{ result['description'] }}</div>
 						<div class="spoiler">
-							<h4 class="spoiler-title">Match Terms</h4>
+							<input class="spoiler-button" type="checkbox" id="content{{ spoiler_num }}spoiler"></input>
+							<label for="content{{ spoiler_num }}spoiler"><h3 class="spoiler-title">Match Terms</h3></label>
 							<div class="spoiler-content">
 								<h5>People:</h5>
 								<ul>
@@ -120,6 +123,7 @@
 							</div>
 						</div>
 					</li>
+					{% set spoilernum += 1 %}
 					{% end %}
 				</ul>
 			</output>

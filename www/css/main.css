@@ -111,4 +111,33 @@ td {
 
 .article {
 	border: 1px solid grey;
+	padding-left: 10px;
+}
+
+li.article {
+	list-style-type: none;
+}
+
+.spoiler-content {
+	display: none;
+}
+
+.spoiler-title{
+	cursor: pointer;
+}
+
+.spoiler-title::before {
+	content: "▶ ";
+}
+
+.spoiler-button:checked+label .spoiler-title::before {
+	content: "▼ ";
+}
+
+.spoiler-button:checked+label+div {
+	display: block;
+}
+
+.spoiler-button {
+	display: none;
 }
