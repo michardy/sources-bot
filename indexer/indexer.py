@@ -1,7 +1,7 @@
 import sys
 sys.path.append("..") 
 
-from annotator import Annotator
+from annotator.annotator import Annotator
 
 from bs4 import BeautifulSoup
 from elasticsearch import Elasticsearch
