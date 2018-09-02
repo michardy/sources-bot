@@ -85,7 +85,10 @@ class AnalysisHandler(tornado.web.RequestHandler):
 			url = '/interactive/search/' + doc_id['index'] + '/' + doc_id['id']
 			self.redirect(url, permanent=False)
 		else:
-			self.send_error(500, reason='Failed to create user story')
+			self.send_error(
+				500,
+				reason='Failed to index remote site. (Remote site probably returned an error)'
+			)
 
 class SearchHandler(tornado.web.RequestHandler):
 	async def get(self, index, doc_id):
