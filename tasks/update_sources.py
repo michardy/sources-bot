@@ -206,8 +206,8 @@ class Wapo(Source):
 	def __isolate_content(self, links):
 		self._content = []
 		for h in links:
+			desc = None
 			if h.name == 'a':
-				desc = None
 				title = h.contents[0]
 				url = h['href']
 			elif h.name == 'div':
