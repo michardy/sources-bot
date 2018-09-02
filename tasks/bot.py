@@ -41,6 +41,13 @@ def get_query(document):
 		"query": {
 			"bool": {
 				"should": []
+				"filter": {
+					"range": {
+						"timestamp": {
+							"gte": "now-2d"
+						}
+					}
+				}
 			}
 		}
 	}
