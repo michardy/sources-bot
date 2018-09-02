@@ -14,11 +14,10 @@ except ImportError:
 	from urllib.parse import urljoin
 
 from news import *
-from annotator.annotator import Annotator
+from indexer import indexer
+
 
 reddit = praw.Reddit('sourcesbot', user_agent='web:sourcesbot:v0.0.2 by /u/michaelh115')
-
-annotator = Annotator()
 
 es = Elasticsearch()
 
