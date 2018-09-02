@@ -91,7 +91,9 @@ class SearchHandler(tornado.web.RequestHandler):
 	async def get(self, index, doc_id):
 		query = {
 			"query": {
-				"match": doc_id
+				"match": {
+					"_id": doc_id
+				}
 			}
 		}
 		articles = es.search(index=index, body=query)
