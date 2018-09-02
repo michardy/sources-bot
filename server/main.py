@@ -30,8 +30,8 @@ def get_query(document):
 		'speakers'
 	]
 	for key in keys:
-		for component in document[attribute]:
-			if attribute in ['people', 'person_ids', 'places', 'place_ids']:
+		for component in document[key]:
+			if key in ['people', 'person_ids', 'places', 'place_ids']:
 				boost = 2
 			else:
 				boost = 1
