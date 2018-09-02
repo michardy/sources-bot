@@ -1,6 +1,7 @@
 import sys
 sys.path.append("..") 
 
+import asyncio
 import praw
 from bs4 import BeautifulSoup
 from string import Template
@@ -99,9 +100,11 @@ def template_links(stories):
 			urls.append(s['url'])
 	return(out)
 
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
 for s in reddit.subreddit('worldnews').hot(limit = 30):
 	if test_in_sites(s.url):
-		doc_id = await(indexer.index('user-stories', url=s.url, refresh=True))
+		doc_id = loop.run_until_complete(indexer.index('user-stories', url=s.url, refresh=True))
 		query = {
 			"query": {
 				"match": {
