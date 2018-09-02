@@ -1,3 +1,6 @@
+import sys
+sys.path.append("..") 
+
 import praw
 from bs4 import BeautifulSoup
 from string import Template
