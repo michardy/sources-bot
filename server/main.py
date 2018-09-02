@@ -37,7 +37,7 @@ def get_query(document):
 				boost = 1
 			match = {
 				"match": {
-					attribute: {
+					key: {
 						"query": component,
 						"boost": boost
 					}
