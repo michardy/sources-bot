@@ -111,6 +111,8 @@ asyncio.set_event_loop(loop)
 for s in reddit.subreddit('worldnews').hot(limit = 30):
 	if test_in_sites(s.url):
 		doc_id = loop.run_until_complete(indexer.index('user-stories', url=s.url, refresh=True))
+		if doc_id is None:
+			continue
 		query = {
 			"query": {
 				"match": {
