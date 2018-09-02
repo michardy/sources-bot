@@ -28,9 +28,12 @@ SITES = [
 	'news.cgtn.com', # China Global Television Network (State run, China)
 	'chron.com/news',
 	'cnn.com', # US 24h news broadcaster
+	'ctvnews.ca', # Canadian Broadcaster (local?)
+	'thedailybeast.com', # US political analysis
 	'nation.co.ke', # The Daily Nation (Kenyan newspaper run by Nation Media Group)
 	'dawn.com/', # Pakistani newspaper
 	'spiegel.de/international', # Der Spiegel (German Newspaper) hopefully english version
+	'dw.com/en/', # German public broadcaster (Sort of state run, its complicated)
 	'foxnews.com', # US conseravative news broadcaster
 	'france24.com/en', # French news broadcaster
 	'theguardian.com', # UK newspaper
@@ -48,6 +51,8 @@ SITES = [
 	'huffingtonpost.com', # US liberal news commentary site
 	'independent.co.uk/news', # UK newspaper
 	'infowars.com/news/', # This is so far gone I am not sure this software will even work. (The headlines contain too much opinion to reasonably find alternate sourcing) (US conservative news commentary)
+	'www.japantimes.co.jp/news', # Japanese Newspaper (news section)
+	'www.japantimes.co.jp/opinion', # Japanese Newspaper (opinion section)
 	'miamiherald.com/news', # Miami newspaper (US)
 	'msnbc.com', # US liberal news broadcaster
 	'nationalreview.com', # US Conservative news magazine
@@ -63,6 +68,7 @@ SITES = [
 	'politico.eu', # Politico European Union subdomain
 	'reuters.com', # News wire
 	'www.rt.com', # Russia Today (www. is the English subdomain) (State run, Russia)
+	'smh.com.au', # Sydney Morning Herald (Austrialian Newspaper)
 	'news.sky.com', # UK broadcaster
 	'slate.com', # US opinion blogs
 	'sabc.co.za/news', # South African Broadcasting Corporation
