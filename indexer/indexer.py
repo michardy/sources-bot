@@ -6,12 +6,9 @@ from annotator.annotator import Annotator
 from bs4 import BeautifulSoup
 from elasticsearch import Elasticsearch
 import datetime
-try:
-	import urllib2
-	from urlparse import urljoin
-except ImportError:
-	import urllib.request as urllib2
-	from urllib.parse import urljoin
+from urllib import request
+from urllib.error import *
+from urllib.parse import urljoin
 
 annotator = Annotator()
 es = Elasticsearch()
@@ -23,8 +20,11 @@ def get_story_title(url):
 	becomes:
 	Andrew McCabe turned over memo on Comey firing to Mueller
 	'''
-	with urllib2.urlopen(url) as p:
-		html = p.read()
+	try:
+		with request.urlopen(url) as p:
+			html = p.read()
+	except HTTPError:
+		return(None)
 	soup = BeautifulSoup(html, "lxml")
 	try:
 		title = soup.find_all('title')[0].contents[0]
@@ -44,6 +44,8 @@ async def create_document(index, url=None, title=None, description=None, refresh
 		return(None)
 	if title is None or len(title) < 2:
 		title = get_story_title(url)
+		if title is None:
+			return(None)
 	document = {
 		'url': url,
 		'timestamp': datetime.datetime.utcnow(),
