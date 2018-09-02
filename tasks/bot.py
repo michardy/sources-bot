@@ -40,7 +40,7 @@ def get_query(document):
 	query = {
 		"query": {
 			"bool": {
-				"should": []
+				"should": [],
 				"filter": {
 					"range": {
 						"timestamp": {
@@ -125,7 +125,7 @@ for s in reddit.subreddit('worldnews').hot(limit = 30):
 			stories = []
 			opinions = []
 			for r in results['hits']['hits']:
-				if r['_score'] > 6 and r['_source']['url'] != s.url:
+				if r['_score'] > 9.5 and r['_source']['url'] != s.url:
 					if (
 						'/opinion/' in r['_source']['url'] or
 						'/opinions/' in r['_source']['url'] or
