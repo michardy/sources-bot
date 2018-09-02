@@ -77,13 +77,21 @@ async def create_document(index, url=None, title=None, description=None, refresh
 			ideas.append(sentence.get_simple_parts({}, None, False))
 			document = sentence.get_characteristics(document)
 	document['ideas'] = ideas
-	res = es.index(
-		index='<'+index+'{now{YYYY-MM-dd}}>',
-		body=document,
-		doc_type='_doc'
-	)
 	if refresh:
-		es.refresh(res['_index'])
+		res = es.index(
+			index='<'+index+'{now{YYYY-MM-dd}}>',
+			body=document,
+			doc_type='_doc',
+			refresh="true"
+		)
+	else:
+		res = es.index(
+			index='<'+index+'{now{YYYY-MM-dd}}>',
+			body=document,
+			doc_type='_doc',
+			refresh="false"
+		)
+
 	return({
 		'index': res['_index'],
 		'id': res['_id']
