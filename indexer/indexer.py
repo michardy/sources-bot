@@ -110,8 +110,8 @@ async def index_by_url(index, url, title=None, description=None, refresh=False):
 		return(await(create_document('stories', url, title, description, refresh)))
 	else:
 		return({
-			'index': search['hits']['hits'][0]['_source']['_index'],
-			'id': search['hits']['hits'][0]['_source']['_id']
+			'index': search['hits']['hits'][0]['_index'],
+			'id': search['hits']['hits'][0]['_id']
 		})
 
 async def index_by_title(index, title, description=None, refresh=False):
@@ -128,8 +128,8 @@ async def index_by_title(index, title, description=None, refresh=False):
 		return(await(create_document('stories', None, title, description, refresh)))
 	else:
 		return({
-			'index': search['hits']['hits'][0]['_source']['_index'],
-			'id': search['hits']['hits'][0]['_source']['_id']
+			'index': search['hits']['hits'][0]['_index'],
+			'id': search['hits']['hits'][0]['_id']
 		})
 
 async def index(index, url=None, title=None, description=None, refresh=False):
