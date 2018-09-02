@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8"/>
+		<meta id="meta" name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="css/main.css"/>
+		<!--Please wait while I sacrafice a newborn goat to IE/Edge. (Edit: It still does not work)-->
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+		<!--All hail Facebook glory be their name.-->
+		<meta property="og:title" content="Sources Bot"/>
+		<meta property="og:type" content="website"/>
+		<meta property="og:url" content=""/>
+		<meta property="og:description" content="A system to find alterate sources for news stories"/>
+		<!--Birdseed (Seems a little repetative doesn't it.)-->
+		<meta name="twitter:title" content="Sources Bot"/>
+		<meta name="twitter:card" content="summary"/>
+		<meta name="twitter:url" content=""/>
+		<meta name="twitter:description" content="A system to find alterate sources for news stories"/>
+		<!--Google.  Meta tags are for normal companies.-->
+		<script type="application/ld+json">
+			{
+				"@context": "http://schema.org",
+				"@type": "WebSite",
+				"name": "Sources Bot",
+				"url": ""
+			}
+		</script>
+		<meta name="google-site-verification" content="gIHQtM45_n6R22KdZf2S9Ech18XHwLsJwbYuPoFbo1Q" />
+		<!--And now for the actual standard that everyone seems to need their own version of (Facebook, Twitter, Google):-->
+		<title>Sources Bot</title>
+		<meta name="description" content="A system to find alterate sources for news stories"/>
+	</head>
+	<body>
+		<heading>
+			<h1><a href="/">Sources Bot</a></h1>
+			<a class="navbar" href="about.html">About</a>&nbsp;
+			<a class="navbar" href="https://github.com/michardy/sources-bot">Code</a>&nbsp;
+			<a class="navbar" href="https://reddit.com/r/sourcesbot">Subreddit</a>&nbsp;
+			<a class="navbar" href="https://reddit.com/u/sourcesbot">Reddit Bot</a>&nbsp;
+		</heading>
+		<main class="text">
+			<div class="article">
+				<h2>
+					{% if query.url is not None %}
+					<a href="{{ query.url }}">{{ query.title }}</a>
+					{% else %}
+					{{ query.title }}
+					{% end %}
+				</h2>
+				{% if query.type is not None %}
+				<div>{{ result.type }}</div>
+				{% end %}
+				<div>{{ query.description }}</div>
+				<div class="spoiler">
+					<h3 class="spoiler-title">Match Terms</h3>
+					<div class="spoiler-content">
+						<h4>People:</h4>
+						<ul>
+							{% for person in query.people %}
+							<li>{{ person }}</li>
+							{% end %}
+						</ul>
+						<h4>Places:</h4>
+						<ul>
+							{% for place in query.places %}
+							<li>{{ place }}</li>
+							{% end %}
+						</ul>
+						<h4>Organizations:</h4>
+						<ul>
+							{% for organization in query.organizations %}
+							<li>{{ organization }}</li>
+							{% end %}
+						</ul>
+						<h4>Actions:</h4>
+						<ul>
+							{% for action in query.actions %}
+							<li>{{ action }}</li>
+							{% end %}
+						</ul>
+					</div>
+				</div>
+			</div>
+			<output>
+				<ul>
+					{% for result in results %}
+					<li class="article">
+						<h3><a href="{{ query.url }}">{{ result.title }}</a></h3>
+						{% if result.type is not None %}
+						<div>{{ result.type }}</div>
+						{% end %}
+						<div>{{ result.description }}</div>
+						<div class="spoiler">
+							<h4 class="spoiler-title">Match Terms</h4>
+							<div class="spoiler-content">
+								<h5>People:</h5>
+								<ul>
+									{% for person in result.people %}
+									<li>{{ person }}</li>
+									{% end %}
+								</ul>
+								<h5>Places:</h5>
+								<ul>
+									{% for place in result.places %}
+									<li>{{ place }}</li>
+									{% end %}
+								</ul>
+								<h5>Organizations:</h5>
+								<ul>
+									{% for organization in result.organizations %}
+									<li>{{ organization }}</li>
+									{% end %}
+								</ul>
+								<h5>Actions:</h5>
+								<ul>
+									{% for action in result.actions %}
+									<li>{{ action }}</li>
+									{% end %}
+								</ul>
+							</div>
+						</div>
+					</li>
+					{% end %}
+				</ul>
+			</output>
+		</main>
+		<footer>
+			<div>
+				&copy; 2018 Michael Hardy
+			</div>
+		</footer>
+		<script src="js/main.js"></script>
+	</body>
+</html>
