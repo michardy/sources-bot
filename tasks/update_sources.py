@@ -206,11 +206,15 @@ class Wapo(Source):
 	def __isolate_content(self, links):
 		self._content = []
 		for h in links:
-			desc = None
-			title = h.contents[0]
+			if h.name == 'a':
+				desc = None
+				title = h.contents[0]
+				url = h['href']
+			elif h.name == 'div':
+				title = h.contents[0].contents[0]
+				url = h.contents[0]['href']
 			if 'blurb' in h.parent.parent.contents[1]['class']:
 				desc = h.parent.parent.contents[1].contents[0]
-			url = h['href']
 			if url.startswith('/'):
 				url = urljoin('http://www.washingtonpost.com', url)
 			self._process(url, title, desc)
@@ -220,6 +224,8 @@ class Wapo(Source):
 		r = urllib2.urlopen("http://www.washingtonpost.com")
 		html = r.read()
 		soup = BeautifulSoup(html, "lxml")
+		links = soup.find_all({'class':'headline'})
+		self.__isolate_content(links)
 		links = soup.find_all('a', {'data-pb-field':'web_headline'})
 		self.__isolate_content(links)
 
