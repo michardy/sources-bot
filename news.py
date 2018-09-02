@@ -60,6 +60,7 @@ SITES = [
 	'pbs.org/newshour', # PBS NewsHour (US news show)
 	'en.people.cn', # People's Daily (State run, China)
 	'politico.com', # US news magazine
+	'politico.eu', # Politico European Union subdomain
 	'reuters.com', # News wire
 	'www.rt.com', # Russia Today (www. is the English subdomain) (State run, Russia)
 	'news.sky.com', # UK broadcaster
