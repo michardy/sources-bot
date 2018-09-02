@@ -64,8 +64,7 @@ async def create_document(index, url=None, title=None, description=None, refresh
 
 	# Split off '<location>:' '<speaker>:' parts
 	titles = title.split(':')
-	if len(titles[0]) < 20:
-		title = titles[0] + '. ' + ':'.join(titles[1:])
+	title = '. '.join(titles)
 
 	machine_title = annotator.annotate(title)
 	for sentence in machine_title:
