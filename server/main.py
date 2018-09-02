@@ -103,7 +103,7 @@ class SearchHandler(tornado.web.RequestHandler):
 			results = es.search(index="stories*", body=query)
 			stories = []
 			for r in results['hits']['hits']:
-				if r['_score'] > 6 and r['_source']['url'] != s.url:
+				if r['_score'] > 6 and r['_source']['url'] != query_doc['url']:
 					stories.append(create_display_dict(r))
 			self.render('results.html', query=query_doc, results=stories)
 		else:
