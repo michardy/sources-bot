@@ -213,8 +213,9 @@ class Wapo(Source):
 			elif h.name == 'div':
 				title = h.contents[0].contents[0]
 				url = h.contents[0]['href']
-			if 'blurb' in h.parent.parent.contents[1]['class']:
-				desc = h.parent.parent.contents[1].contents[0]
+				b = h.parent.find_all({'class':'blurb'})
+				if len(b) == 1:
+					desc = b[0].contents[0]
 			if url.startswith('/'):
 				url = urljoin('http://www.washingtonpost.com', url)
 			self._process(url, title, desc)
