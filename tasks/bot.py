@@ -28,8 +28,9 @@ $sources
 Opinions:
 
 $opinions
+
+[More on this issue](https://sourcesbot.com/interactive/search/$storyid)
 __________
-^(*Note on opinions: due to sourcing and how articles are matched the opinions may not be terribly diverse.*)
 ^*[feedback](https://www.reddit.com/r/sourcesbot/comments/6v0pa5/feedback/)* ^| ^*[usage](https://www.reddit.com/r/sourcesbot/wiki/index)* ^| ^*[code]($code)* ^| ^*author:* ^*$writer*'''
 
 TEMPLATE_NFOUND = '''No acceptable matches were found
@@ -155,6 +156,7 @@ for s in reddit.subreddit('worldnews').hot(limit = 30):
 					temp.substitute(
 						sources=articles,
 						opinions=editorials,
+						storyid=doc_id['index']+'/'+doc_id['id'],
 						writer='/u/michaelh115',
 						code='https://github.com/michardy/sources-bot'
 					)
@@ -164,6 +166,7 @@ for s in reddit.subreddit('worldnews').hot(limit = 30):
 				#	temp.substitute(
 				#		sources=articles,
 				#		opinions=editorials,
+				#		storyid=doc_id['index']+'/'+doc_id['id'],
 				#		writer='/u/michaelh115',
 				#		code='https://github.com/michardy/sources-bot'
 				#	)
