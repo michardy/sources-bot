@@ -31,25 +31,25 @@
 		<meta name="description" content="A system to find alterate sources for news stories"/>
 	</head>
 	<body>
-		<heading>
+		<header>
 			<h1><a href="/">Sources Bot</a></h1>
 			<a class="navbar" href="about.html">About</a>&nbsp;
 			<a class="navbar" href="https://github.com/michardy/sources-bot">Code</a>&nbsp;
 			<a class="navbar" href="https://reddit.com/r/sourcesbot">Subreddit</a>&nbsp;
 			<a class="navbar" href="https://reddit.com/u/sourcesbot">Reddit Bot</a>&nbsp;
-		</heading>
+		</header>
 		<main class="search">
 			<h2>Find Similar Articles:</h2>
 			<form id="searchform" action="/interactive/analyze" method="POST">
 				<div id="tabbar">
 					<span>Search by:</span>
-					<input onclick="update_search(this);" id="urlselector" class="fatradio-button" type="radio" name="type" value="url" checked></input>
+					<input onclick="update_search(this);" id="urlselector" class="fatradio-button" type="radio" name="type" value="url" checked/>
 					<label for="urlselector">article url</label>
-					<input onclick="update_search(this);" id ="titleselector" class="fatradio-button" type="radio" name="type" value="title"></input>
+					<input onclick="update_search(this);" id ="titleselector" class="fatradio-button" type="radio" name="type" value="title"/>
 					<label for="titleselector">article title</label>
 				</div>
 				<div id="searcharea">
-					<input id="searchbox" type="text" placeholder="URL or article title" name="query"></input>
+					<input id="searchbox" type="text" placeholder="URL or article title" name="query"/>
 					<button>Search</button>
 				</div>
 			</form>

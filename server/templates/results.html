@@ -31,13 +31,13 @@
 		<meta name="description" content="A system to find alterate sources for news stories"/>
 	</head>
 	<body>
-		<heading>
+		<header>
 			<h1><a href="/">Sources Bot</a></h1>
 			<a class="navbar" href="about.html">About</a>&nbsp;
 			<a class="navbar" href="https://github.com/michardy/sources-bot">Code</a>&nbsp;
 			<a class="navbar" href="https://reddit.com/r/sourcesbot">Subreddit</a>&nbsp;
 			<a class="navbar" href="https://reddit.com/u/sourcesbot">Reddit Bot</a>&nbsp;
-		</heading>
+		</header>
 		<main class="text">
 			<div class="article">
 				<h2>
@@ -54,7 +54,7 @@
 				<div>{{ query['description'] }}</div>
 				{% end %}
 				<div class="spoiler">
-					<input class="spoiler-button" type="checkbox" id="queryspoiler"></input>
+					<input class="spoiler-button" type="checkbox" id="queryspoiler"/>
 					<label for="queryspoiler"><h3 class="spoiler-title">Match Terms</h3></label>
 					<div class="spoiler-content">
 						<h4>People:</h4>
@@ -97,7 +97,7 @@
 						<div>{{ query['description'] }}</div>
 						{% end %}
 						<div class="spoiler">
-							<input class="spoiler-button" type="checkbox" id="content{{ spoiler_num }}spoiler"></input>
+							<input class="spoiler-button" type="checkbox" id="content{{ spoiler_num }}spoiler"/>
 							<label for="content{{ spoiler_num }}spoiler"><h3 class="spoiler-title">Match Terms</h3></label>
 							<div class="spoiler-content">
 								<h5>People:</h5>
