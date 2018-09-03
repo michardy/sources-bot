@@ -58,27 +58,43 @@
 					<label for="queryspoiler"><h3 class="spoiler-title">Match Terms</h3></label>
 					<div class="spoiler-content">
 						<h4>People:</h4>
-						<ul>
+						<ul class="taglist">
 							{% for person in query['people'] %}
-							<li>{{ person }}</li>
+							<li>
+								<a href="/interactive/tag/people/{{ person }}">{{ person }}</a>
+							</li>
 							{% end %}
 						</ul>
 						<h4>Places:</h4>
-						<ul>
+						<ul class="taglist">
 							{% for place in query['places'] %}
-							<li>{{ place }}</li>
+							<li>
+								<a href="/interactive/tag/places/{{ place }}">{{ place }}</a>
+							</li>
 							{% end %}
 						</ul>
 						<h4>Organizations:</h4>
-						<ul>
+						<ul class="taglist">
 							{% for organization in query['organizations'] %}
-							<li>{{ organization }}</li>
+							<li>
+								<a href="/interactive/tag/organizations/{{ organization }}">{{ organization }}</a>
+							</li>
+							{% end %}
+						</ul>
+						<h4>Things:</h4>
+						<ul class="taglist">
+							{% for thing in query['things'] %}
+							<li>
+								<a href="/interactive/tag/things/{{ thing }}">{{ thing }}</a>
+							</li>
 							{% end %}
 						</ul>
 						<h4>Actions:</h4>
-						<ul>
+						<ul class="taglist">
 							{% for action in query['actions'] %}
-							<li>{{ action }}</li>
+							<li>
+								<a href="/interactive/tag/actions/{{ action }}">{{ action }}</a>
+							</li>
 							{% end %}
 						</ul>
 					</div>
