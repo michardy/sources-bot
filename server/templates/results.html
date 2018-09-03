@@ -93,8 +93,8 @@
 						{% if result['type'] is not None %}
 						<div>{{ result['type'] }}</div>
 						{% end %}
-						{% if query['description'] is not None %}
-						<div>{{ query['description'] }}</div>
+						{% if result['description'] is not None %}
+						<div>{{ result['description'] }}</div>
 						{% end %}
 						<div class="spoiler">
 							<input class="spoiler-button" type="checkbox" id="content{{ spoiler_num }}spoiler"/>
