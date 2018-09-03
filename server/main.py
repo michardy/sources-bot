@@ -1,5 +1,5 @@
 import sys
-sys.path.append("..") 
+sys.path.append("..")
 
 from indexer import indexer
 
@@ -8,6 +8,7 @@ import tornado.ioloop
 import tornado.web
 
 es = Elasticsearch()
+
 
 def get_query(document):
 	query = {
@@ -46,6 +47,7 @@ def get_query(document):
 			query["query"]["bool"]["should"].append(match)
 	return(query)
 
+
 def create_display_dict(hit):
 	story = {}
 	if (
@@ -78,6 +80,7 @@ def create_display_dict(hit):
 			story[k] = None
 	return(story)
 
+
 class AnalysisHandler(tornado.web.RequestHandler):
 	async def post(self):
 		query = self.get_argument('query')
@@ -93,6 +96,7 @@ class AnalysisHandler(tornado.web.RequestHandler):
 				500,
 				reason='Failed to index remote site. (Remote site probably returned an error)'
 			)
+
 
 class SearchHandler(tornado.web.RequestHandler):
 	async def get(self, index, doc_id):
@@ -116,6 +120,7 @@ class SearchHandler(tornado.web.RequestHandler):
 		else:
 			self.send_error(404, reason='Story Not Found')
 
+
 class TagHandler(tornado.web.RequestHandler):
 	async def get(self, field, tag):
 		if field not in ['people', 'places', 'things', 'organizations', 'actions']:
@@ -132,10 +137,10 @@ class TagHandler(tornado.web.RequestHandler):
 			self.send_error(404, reason='Tag not found')
 		display_mapping = {
 			'people': 'person ',
-			'places':'place ',
-			'things':'',
-			'organizations':'orgaization ',
-			'actions':'action '
+			'places': 'place ',
+			'things': '',
+			'organizations': 'orgaization ',
+			'actions': 'action '
 		}
 		results = []
 		for article in articles['hits']['hits']:
@@ -146,6 +151,7 @@ class TagHandler(tornado.web.RequestHandler):
 			tag=tag,
 			results=results
 		)
+
 
 def make_app():
 	return tornado.web.Application([
