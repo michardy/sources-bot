@@ -116,19 +116,6 @@ class SearchHandler(tornado.web.RequestHandler):
 		else:
 			self.send_error(404, reason='Story Not Found')
 
-
-def make_app():
-	return tornado.web.Application([
-		(r"/interactive/analyze", AnalysisHandler),
-		(r"/interactive/search/([^/]+)/([^/]+)", SearchHandler),
-		(r"/interactive/tag/([^/]+)/([^/]+)", TagHandler)
-	], template_path='templates/')
-
-if __name__ == "__main__":
-	app = make_app()
-	app.listen(8888)
-	tornado.ioloop.IOLoop.current().start()
-
 class TagHandler(tornado.web.RequestHandler):
 	async def get(self, field, tag):
 		if field not in ['people', 'places', 'things', 'organizations', 'actions']:
@@ -159,3 +146,15 @@ class TagHandler(tornado.web.RequestHandler):
 			tag=tag,
 			results=results
 		)
+
+def make_app():
+	return tornado.web.Application([
+		(r"/interactive/analyze", AnalysisHandler),
+		(r"/interactive/search/([^/]+)/([^/]+)", SearchHandler),
+		(r"/interactive/tag/([^/]+)/([^/]+)", TagHandler)
+	], template_path='templates/')
+
+if __name__ == "__main__":
+	app = make_app()
+	app.listen(8888)
+	tornado.ioloop.IOLoop.current().start()
