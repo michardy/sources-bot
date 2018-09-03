@@ -50,7 +50,9 @@
 				{% if query['type'] is not None %}
 				<div>{{ query['type'] }}</div>
 				{% end %}
+				{% if query['description'] is not None %}
 				<div>{{ query['description'] }}</div>
+				{% end %}
 				<div class="spoiler">
 					<input class="spoiler-button" type="checkbox" id="queryspoiler"></input>
 					<label for="queryspoiler"><h3 class="spoiler-title">Match Terms</h3></label>
@@ -91,7 +93,9 @@
 						{% if result['type'] is not None %}
 						<div>{{ result['type'] }}</div>
 						{% end %}
-						<div>{{ result['description'] }}</div>
+						{% if query['description'] is not None %}
+						<div>{{ query['description'] }}</div>
+						{% end %}
 						<div class="spoiler">
 							<input class="spoiler-button" type="checkbox" id="content{{ spoiler_num }}spoiler"></input>
 							<label for="content{{ spoiler_num }}spoiler"><h3 class="spoiler-title">Match Terms</h3></label>
