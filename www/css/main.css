@@ -16,9 +16,18 @@ header h1 a {
 	text-decoration:none;
 }
 
-main.text {
-	grid-column: 2 / 4;
-	grid-row:2;
+@media (min-aspect-ratio: 4/3) {
+	main.text {
+		grid-column: 2 / 4;
+		grid-row:2;
+	}
+}
+
+@media (max-aspect-ratio: 4/3) {
+	main.text {
+		grid-column: 1 / 4;
+		grid-row:2;
+	}
 }
 
 main.search {
@@ -143,14 +152,20 @@ li.article {
 	display: none;
 }
 
+.taglist {
+	margin-left: -40px;
+}
+
 .taglist li {
 	list-style-type: none;
-	display: inline;
+	display: inline-block;
 }
 
 .taglist li a {
 	text-decoration: none;
 	border: 1px solid lightgray;
 	background-color: lightblue;
+	line-height: 40px;
+	margin: 5px;
 	padding: 5px;
 }
