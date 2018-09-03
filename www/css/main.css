@@ -112,6 +112,7 @@ td {
 .article {
 	border: 1px solid grey;
 	padding-left: 10px;
+	padding-bottom: 10px;
 }
 
 li.article {
@@ -140,4 +141,16 @@ li.article {
 
 .spoiler-button {
 	display: none;
+}
+
+.taglist li {
+	list-style-type: none;
+	display: inline;
+}
+
+.taglist li a {
+	text-decoration: none;
+	border: 1px solid lightgray;
+	background-color: lightblue;
+	padding: 5px;
 }
