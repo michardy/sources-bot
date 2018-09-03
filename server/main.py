@@ -136,11 +136,11 @@ class TagHandler(tornado.web.RequestHandler):
 		if articles['hits']['total'] == 0:
 			self.send_error(404, reason='Tag not found')
 		display_mapping = {
-			'people': 'person ',
-			'places': 'place ',
-			'things': '',
-			'organizations': 'orgaization ',
-			'actions': 'action '
+			'people': 'Person',
+			'places': 'Place',
+			'things': 'Thing',
+			'organizations': 'Organization',
+			'actions': 'Action'
 		}
 		results = []
 		for article in articles['hits']['hits']:

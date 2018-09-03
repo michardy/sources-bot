@@ -101,33 +101,43 @@
 							<label for="content{{ spoiler_num }}spoiler"><h3 class="spoiler-title">Match Terms</h3></label>
 							<div class="spoiler-content">
 								<h5>People:</h5>
-								<ul>
+								<ul class="taglist">
 									{% for person in result['people'] %}
-									<li>{{ person }}</li>
+									<li>
+										<a href="/interactive/tag/people/{{ person }}">{{ person }}</a>
+									</li>
 									{% end %}
 								</ul>
 								<h5>Places:</h5>
-								<ul>
+								<ul class="taglist">
 									{% for place in result['places'] %}
-									<li>{{ place }}</li>
+									<li>
+										<a href="/interactive/tag/places/{{ place }}">{{ place }}</a>
+									</li>
 									{% end %}
 								</ul>
 								<h5>Organizations:</h5>
-								<ul>
+								<ul class="taglist">
 									{% for organization in result['organizations'] %}
-									<li>{{ organization }}</li>
+									<li>
+										<a href="/interactive/tag/organizations/{{ organization }}">{{ organization }}</a>
+									</li>
 									{% end %}
 								</ul>
 								<h5>Things:</h5>
-								<ul>
+								<ul class="taglist">
 									{% for thing in result['things'] %}
-									<li>{{ thing }}</li>
+									<li>
+										<a href="/interactive/tag/things/{{ thing }}">{{ thing }}</a>
+									</li>
 									{% end %}
 								</ul>
 								<h5>Actions:</h5>
-								<ul>
+								<ul class="taglist">
 									{% for action in result['actions'] %}
-									<li>{{ action }}</li>
+									<li>
+										<a href="/interactive/tag/actions/{{ action }}">{{ action }}</a>
+									</li>
 									{% end %}
 								</ul>
 							</div>
