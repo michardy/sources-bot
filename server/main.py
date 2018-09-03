@@ -116,13 +116,46 @@ class SearchHandler(tornado.web.RequestHandler):
 		else:
 			self.send_error(404, reason='Story Not Found')
 
+
 def make_app():
 	return tornado.web.Application([
 		(r"/interactive/analyze", AnalysisHandler),
-		(r"/interactive/search/([^/]+)/([^/]+)", SearchHandler)
+		(r"/interactive/search/([^/]+)/([^/]+)", SearchHandler),
+		(r"/interactive/tag/([^/]+)/([^/]+)", TagHandler)
 	], template_path='templates/')
 
 if __name__ == "__main__":
 	app = make_app()
 	app.listen(8888)
 	tornado.ioloop.IOLoop.current().start()
+
+class TagHandler(tornado.web.RequestHandler):
+	async def get(self, field, tag):
+		if field not in ['people', 'places', 'things', 'organizations', 'actions']:
+			self.send_error(400, reason='Invalid tag field')
+		query = {
+			"query": {
+				"match": {
+					filed: tag
+				}
+			}
+		}
+		articles = es.search(index=index, body=query)
+		if articles['hits']['total'] == 0:
+			self.send_error(404, reason='Tag not found')
+		display_mapping = {
+			'people': 'person ',
+			'places':'place ',
+			'things':'',
+			'organizations':'orgaization ',
+			'actions':'action '
+		}
+		results = []
+		for article in articles['hits']['hits']:
+			results.append(create_display_dict(article))
+		self.render(
+			'tag_search.html',
+			tag_type=display_mapping[field],
+			tag=tag,
+			results=results
+		)
