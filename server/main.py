@@ -123,7 +123,7 @@ class TagHandler(tornado.web.RequestHandler):
 		query = {
 			"query": {
 				"match": {
-					filed: tag
+					fieled: tag
 				}
 			}
 		}
