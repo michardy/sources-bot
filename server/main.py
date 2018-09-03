@@ -66,6 +66,7 @@ def create_display_dict(hit):
 		'actions',
 		'places',
 		'people',
+		'things',
 		'title',
 		'description',
 		'url'

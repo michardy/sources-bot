@@ -118,6 +118,12 @@
 									<li>{{ organization }}</li>
 									{% end %}
 								</ul>
+								<h5>Things:</h5>
+								<ul>
+									{% for thing in result['things'] %}
+									<li>{{ thing }}</li>
+									{% end %}
+								</ul>
 								<h5>Actions:</h5>
 								<ul>
 									{% for action in result['actions'] %}
