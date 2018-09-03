@@ -127,7 +127,7 @@ class TagHandler(tornado.web.RequestHandler):
 				}
 			}
 		}
-		articles = es.search(index=index, body=query)
+		articles = es.search(index="stories*", body=query)
 		if articles['hits']['total'] == 0:
 			self.send_error(404, reason='Tag not found')
 		display_mapping = {
