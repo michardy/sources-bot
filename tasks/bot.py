@@ -31,11 +31,11 @@ $opinions
 
 [More on this issue](https://sourcesbot.com/interactive/search/$storyid)
 __________
-^*[feedback](https://www.reddit.com/r/sourcesbot/comments/6v0pa5/feedback/)* ^| ^*[usage](https://www.reddit.com/r/sourcesbot/wiki/index)* ^| ^*[code]($code)* ^| ^*author:* ^*$writer*'''
+^*[feedback](https://www.reddit.com/r/sourcesbot/)* ^| ^*[usage](https://www.reddit.com/r/sourcesbot/wiki/index)* ^| ^*[code]($code)* ^| ^*author:* ^*$writer*'''
 
 TEMPLATE_NFOUND = '''No acceptable matches were found
 __________
-^*[feedback](https://www.reddit.com/r/sourcesbot/comments/6v0pa5/feedback/)* ^| ^*[usage](https://www.reddit.com/r/sourcesbot/wiki/index)* ^| ^*[code]($code)* ^| ^*author:* ^*$writer*'''
+^*[feedback](https://www.reddit.com/r/sourcesbot/)* ^| ^*[usage](https://www.reddit.com/r/sourcesbot/wiki/index)* ^| ^*[code]($code)* ^| ^*author:* ^*$writer*'''
 
 def get_query(document):
 	query = {

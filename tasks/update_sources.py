@@ -130,12 +130,12 @@ class Bbc(Source):
 				if url == '/radio/player/bbc_world_service' or url == '/news/world_radio_and_tv':
 					continue
 				if url.startswith('/'):
-					url = urljoin('http://www.bbc.com/news', url)
+					url = urljoin('https://www.bbc.com/news', url)
 				self._process(url, title, desc)
 
 	def get(self):
 		self._time = datetime.datetime.utcnow()
-		r = urllib2.urlopen("http://www.bbc.com/news")
+		r = urllib2.urlopen("https://www.bbc.com/news")
 		html = r.read()
 		soup = BeautifulSoup(html, "lxml")
 		links = soup.find_all('div', {'class':'gs-c-promo'})
