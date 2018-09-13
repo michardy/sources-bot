@@ -38,7 +38,8 @@
 			<a class="navbar" href="https://reddit.com/r/sourcesbot">Subreddit</a>&nbsp;
 			<a class="navbar" href="https://reddit.com/u/sourcesbot">Reddit Bot</a>&nbsp;
 		</header>
-		<main class="text">
+		<div id="histogram" title="Matches for this story over time"></div>
+		<main class="results">
 			<div class="article">
 				<h2>
 					{% if query['url'] is not None %}
@@ -168,6 +169,33 @@
 			<div>
 				&copy; 2018 Michael Hardy
 			</div>
+			<div>
+				Graphs rendered with <a href="https://plot.ly/javascript/">plotly.js</a>
+			</div>
 		</footer>
+		<!--Graphing-->
+		<script src="https://cdn.plot.ly/plotly-1.41.0.min.js"></script>
+		<script>
+			fetch('/interactive/search/graph/{{ index }}/{{ doc }}')
+				.then(function(response) {
+					return response.json();
+				})
+				.then(function(data){
+					var layout = {
+						showlegend: false,
+						margin: {
+							l: 50,
+							r: 50,
+							b: 50,
+							t: 50,
+							pad: 4
+						},
+						yaxis: {
+							title: 'Number of Articles'
+						}
+					};
+					Plotly.newPlot('histogram', data, layout, {staticPlot: true});
+				})
+		</script>
 	</body>
 </html>

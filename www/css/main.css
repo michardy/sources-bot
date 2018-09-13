@@ -30,6 +30,20 @@ header h1 a {
 	}
 }
 
+@media (min-aspect-ratio: 4/3) {
+	main.results {
+		grid-column: 2 / 4;
+		grid-row:3;
+	}
+}
+
+@media (max-aspect-ratio: 4/3) {
+	main.results {
+		grid-column: 1 / 4;
+		grid-row:3;
+	}
+}
+
 main.search {
 	position: relative;
 	grid-column: 1 / 5;
@@ -168,4 +182,23 @@ li.article {
 	line-height: 40px;
 	margin: 5px;
 	padding: 5px;
+}
+
+#histogram {
+	grid-column: 1 / 5;
+	grid-row: 2;
+	height: 100%;
+}
+
+@media (min-aspect-ratio: 4/3) {
+	#histogram {
+		width: 75%;
+		transform: translate(12.5%);
+	}
+}
+
+@media (max-aspect-ratio: 4/3) {
+	#histogram {
+		width: 96%;
+	}
 }
