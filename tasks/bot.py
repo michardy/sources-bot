@@ -41,7 +41,18 @@ def get_query(document):
 	query = {
 		"query": {
 			"bool": {
-				"should": [],
+				"should": [
+					{
+						"match": {
+							"range": {
+								"timestamp": {
+									"gte": "now-1d"
+									}
+								}
+							}
+						}
+					}
+				],
 				"filter": {
 					"range": {
 						"timestamp": {
