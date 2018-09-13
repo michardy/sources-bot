@@ -48,6 +48,53 @@ def get_query(document):
 	return(query)
 
 
+def get_graph_query(document):
+	query = {
+		"size": 0,
+		"query": {
+			"bool": {
+				"should": []
+			}
+		},
+		"aggs": {
+			"time": {
+				"date_histogram": {
+					"field": "timestamp",
+					"interval": "day"
+				}
+			}
+		}
+	}
+	keys = [
+		'person_ids',
+		'organizations',
+		'actions',
+		'places',
+		'thing_ids',
+		'place_ids',
+		'organization_ids',
+		'things',
+		'people',
+		'speakers'
+	]
+	for key in keys:
+		for component in document[key]:
+			if key in ['people', 'person_ids', 'places', 'place_ids']:
+				boost = 2
+			else:
+				boost = 1
+			match = {
+				"match": {
+					key: {
+						"query": component,
+						"boost": boost
+					}
+				}
+			}
+			query["query"]["bool"]["should"].append(match)
+	return(query)
+
+
 def create_display_dict(hit):
 	story = {}
 	if (
@@ -121,6 +168,32 @@ class SearchHandler(tornado.web.RequestHandler):
 			self.send_error(404, reason='Story Not Found')
 
 
+class SearchGraphHandler(tornado.web.RequestHandler):
+	async def get(self, index, doc_id):
+		query = {
+			"query": {
+				"match": {
+					"_id": doc_id
+				}
+			}
+		}
+		articles = es.search(index=index, body=query)
+		if articles['hits']['total'] > 0:
+			query = get_graph_query(articles['hits']['hits'][0]['_source'])
+			response = es.search(index="stories*", body=query)
+			graph = {
+				'x': [],
+				'y': [],
+				'type': 'timeseries'
+			}
+			for bucket in response['aggregations']['time']['buckets']:
+				graph['x'].append(bucket['key_as_string'])
+				graph['y'].append(bucket['doc_count'])
+			self.write(graph)
+		else:
+			self.send_error(404, reason='Story Not Found')
+
+
 class TagHandler(tornado.web.RequestHandler):
 	async def get(self, field, tag):
 		if field not in ['people', 'places', 'things', 'organizations', 'actions']:
@@ -153,11 +226,45 @@ class TagHandler(tornado.web.RequestHandler):
 		)
 
 
+class TagGraphHandler(tornado.web.RequestHandler):
+	async def get(self, field, tag):
+		if field not in ['people', 'places', 'things', 'organizations', 'actions']:
+			self.send_error(400, reason='Invalid tag field')
+		query = {
+			"size": 0,
+			"query": {
+				"match": {
+					field: tag
+				}
+			},
+			"aggs": {
+				"time": {
+						"date_histogram": {
+						"field": "timestamp",
+						"interval": "day"
+					}
+				}
+			}
+		}
+		graph = {
+			'x': [],
+			'y': [],
+			'type': 'timeseries'
+		}
+		response = es.search(index="stories*", body=query)
+		for bucket in response['aggregations']['time']['buckets']:
+			graph['x'].append(bucket['key_as_string'])
+			graph['y'].append(bucket['doc_count'])
+		self.write(graph)
+
+
 def make_app():
 	return tornado.web.Application([
 		(r"/interactive/analyze", AnalysisHandler),
 		(r"/interactive/search/([^/]+)/([^/]+)", SearchHandler),
+		(r"/interactive/search/([^/]+)/([^/]+)/graph", SearchGraphHandler),
 		(r"/interactive/tag/([^/]+)/([^/]+)", TagHandler)
+		(r"/interactive/tag/([^/]+)/([^/]+)/graph", TagGraphHandler)
 	], template_path='templates/')
 
 if __name__ == "__main__":
