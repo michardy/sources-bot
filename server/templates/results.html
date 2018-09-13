@@ -176,7 +176,7 @@
 		<!--Graphing-->
 		<script src="https://cdn.plot.ly/plotly-1.41.0.min.js"></script>
 		<script>
-			fetch('/interactive/search/graph/{{ index }}/{{ doc }}')
+			fetch('/interactive/search/{{ index }}/{{ doc }}/graph')
 				.then(function(response) {
 					return response.json();
 				})

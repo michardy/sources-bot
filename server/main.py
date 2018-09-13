@@ -227,6 +227,7 @@ class TagHandler(tornado.web.RequestHandler):
 		self.render(
 			'tag_search.html',
 			tag_type=display_mapping[field],
+			tag_field=field,
 			tag=tag,
 			results=results
 		)
@@ -269,7 +270,7 @@ def make_app():
 		(r"/interactive/analyze", AnalysisHandler),
 		(r"/interactive/search/([^/]+)/([^/]+)", SearchHandler),
 		(r"/interactive/search/([^/]+)/([^/]+)/graph", SearchGraphHandler),
-		(r"/interactive/tag/([^/]+)/([^/]+)", TagHandler)
+		(r"/interactive/tag/([^/]+)/([^/]+)", TagHandler),
 		(r"/interactive/tag/([^/]+)/([^/]+)/graph", TagGraphHandler)
 	], template_path='templates/')
 

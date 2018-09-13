@@ -116,7 +116,7 @@
 		<!--Graphing-->
 		<script src="https://cdn.plot.ly/plotly-1.41.0.min.js"></script>
 		<script>
-			fetch('/interactive/tag/graph/{{ tag_type }}/{{ tag }}')
+			fetch('/interactive/tag/{{ tag_field }}/{{ tag }}/graph')
 				.then(function(response) {
 					return response.json();
 				})
