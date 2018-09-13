@@ -187,16 +187,14 @@ class SearchGraphHandler(tornado.web.RequestHandler):
 		if articles['hits']['total'] > 0:
 			query = get_graph_query(articles['hits']['hits'][0]['_source'])
 			response = es.search(index="stories*", body=query)
-			graph = [
-				{
-					'x': [],
-					'y': [],
-					'type': 'timeseries'
-				}
-			]
+			graph = {
+				'x': [],
+				'y': [],
+				'type': 'timeseries'
+			}
 			for bucket in response['aggregations']['time']['buckets']:
-				graph[0]['x'].append(bucket['key_as_string'])
-				graph[0]['y'].append(bucket['doc_count'])
+				graph['x'].append(bucket['key_as_string'])
+				graph['y'].append(bucket['doc_count'])
 			self.write(graph)
 		else:
 			self.send_error(404, reason='Story Not Found')
@@ -255,17 +253,15 @@ class TagGraphHandler(tornado.web.RequestHandler):
 				}
 			}
 		}
-		graph = [
-			{
-				'x': [],
-				'y': [],
-				'type': 'timeseries'
-			}
-		]
+		graph = {
+			'x': [],
+			'y': [],
+			'type': 'timeseries'
+		}
 		response = es.search(index="stories*", body=query)
 		for bucket in response['aggregations']['time']['buckets']:
-			graph[0]['x'].append(bucket['key_as_string'])
-			graph[0]['y'].append(bucket['doc_count'])
+			graph['x'].append(bucket['key_as_string'])
+			graph['y'].append(bucket['doc_count'])
 		self.write(graph)
 
 
