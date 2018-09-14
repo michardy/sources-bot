@@ -43,11 +43,9 @@ def get_query(document):
 			"bool": {
 				"should": [
 					{
-						"match": {
-							"range": {
-								"timestamp": {
-									"gte": "now-1d"
-								}
+						"range": {
+							"timestamp": {
+								"gte": "now-1d"
 							}
 						}
 					}
