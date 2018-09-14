@@ -115,6 +115,16 @@ def template_links(stories):
 			urls.append(s['url'])
 	return(out)
 
+def clean_url(url):
+	'''Remove the protocol, url parameters, and ID selectors'''
+	if '://' in url:
+		url = ':'.join(url.split(':')[1:])
+	if '?' in url:
+		url = '?'.join(url.split('?')[:1])
+	if '#' in url:
+		url = '#'.join(url.split('#')[:1])
+	return(url)
+
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 for s in reddit.subreddit('worldnews').hot(limit = 30):
@@ -135,7 +145,9 @@ for s in reddit.subreddit('worldnews').hot(limit = 30):
 			results = es.search(index="stories*", body=query)
 			stories = []
 			opinions = []
+			urls = [clean_url(s.url)]
 			for r in results['hits']['hits']:
+				cleaned_url = clean_url(r['_source']['url'])
 				if (
 					'/opinion/' in r['_source']['url'] or
 					'/opinions/' in r['_source']['url'] or
@@ -143,19 +155,21 @@ for s in reddit.subreddit('worldnews').hot(limit = 30):
 					'/commentisfree/' in r['_source']['url'] or
 					'/posteverything/' in r['_source']['url']
 				):
-					if r['_score'] > 6 and r['_source']['url'] != s.url:
+					if r['_score'] > 6 and cleaned_url not in urls:
 						opinions.append({
 							'url': r['_source']['url'],
 							'title': r['_source']['title'],
 							'score': r['_score']
 						})
+						urls.append(cleaned_url)
 				else:
-					if r['_score'] > 11.5 and r['_source']['url'] != s.url:
+					if r['_score'] > 11.5 and cleaned_url not in urls:
 						stories.append({
 							'url': r['_source']['url'],
 							'title': r['_source']['title'],
 							'score': r['_score']
 						})
+						urls.append(cleaned_url)
 			temp = Template(TEMPLATE)
 			articles = template_links(stories)
 			editorials = template_links(opinions)
