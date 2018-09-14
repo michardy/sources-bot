@@ -17,7 +17,7 @@ from news import *
 from indexer import indexer
 
 
-reddit = praw.Reddit('sourcesbot', user_agent='web:sourcesbot:v0.0.2 by /u/michaelh115')
+reddit = praw.Reddit('sourcesbot', user_agent='web:sourcesbot:v0.0.3 by /u/michaelh115')
 
 es = Elasticsearch()
 
