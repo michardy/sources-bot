@@ -47,7 +47,6 @@ def get_query(document):
 							"range": {
 								"timestamp": {
 									"gte": "now-1d"
-									}
 								}
 							}
 						}
