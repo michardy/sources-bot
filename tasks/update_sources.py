@@ -98,7 +98,7 @@ class AlJazeera(Source):
 				if url.startswith('/topics'):
 					continue
 				if url.startswith('/'):
-					url = urljoin('http://www.aljazeera.com/', url)
+					url = urljoin('https://www.aljazeera.com/', url)
 			except KeyError: # Yes, here at Al Jazeera we use empty <a> tags!
 				pass
 			if not url.startswith('http') or title == '' or title == '\n':
@@ -106,7 +106,7 @@ class AlJazeera(Source):
 			self._process(url, title, desc)
 
 	def get(self):
-		r = urllib2.urlopen("http://www.aljazeera.com/")
+		r = urllib2.urlopen("https://www.aljazeera.com/")
 		html = r.read()
 		soup = BeautifulSoup(html, "lxml")
 		links = soup.find_all('a')
@@ -216,12 +216,12 @@ class Wapo(Source):
 				if len(b) == 1:
 					desc = b[0].contents[0]
 			if url.startswith('/'):
-				url = urljoin('http://www.washingtonpost.com', url)
+				url = urljoin('https://www.washingtonpost.com', url)
 			self._process(url, title, desc)
 
 	def get(self):
 		self._time = datetime.datetime.utcnow()
-		r = urllib2.urlopen("http://www.washingtonpost.com")
+		r = urllib2.urlopen("https://www.washingtonpost.com")
 		html = r.read()
 		soup = BeautifulSoup(html, "lxml")
 		links = soup.find_all({'class':'headline'})
