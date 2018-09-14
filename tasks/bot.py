@@ -139,20 +139,21 @@ for s in reddit.subreddit('worldnews').hot(limit = 30):
 			stories = []
 			opinions = []
 			for r in results['hits']['hits']:
-				if r['_score'] > 9.5 and r['_source']['url'] != s.url:
-					if (
-						'/opinion/' in r['_source']['url'] or
-						'/opinions/' in r['_source']['url'] or
-						'/blogs/' in r['_source']['url'] or
-						'/commentisfree/' in r['_source']['url'] or
-						'/posteverything/' in r['_source']['url']
-					):
+				if (
+					'/opinion/' in r['_source']['url'] or
+					'/opinions/' in r['_source']['url'] or
+					'/blogs/' in r['_source']['url'] or
+					'/commentisfree/' in r['_source']['url'] or
+					'/posteverything/' in r['_source']['url']
+				):
+					if r['_score'] > 6 and r['_source']['url'] != s.url:
 						opinions.append({
 							'url': r['_source']['url'],
 							'title': r['_source']['title'],
 							'score': r['_score']
 						})
-					else:
+				else:
+					if r['_score'] > 11.5 and r['_source']['url'] != s.url:
 						stories.append({
 							'url': r['_source']['url'],
 							'title': r['_source']['title'],
