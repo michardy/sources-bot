@@ -128,6 +128,17 @@ def create_display_dict(hit):
 	return(story)
 
 
+def clean_url(url):
+	'''Remove the protocol, url parameters, and ID selectors'''
+	if '://' in url:
+		url = ':'.join(url.split(':')[1:])
+	if '?' in url:
+		url = '?'.join(url.split('?')[:1])
+	if '#' in url:
+		url = '#'.join(url.split('#')[:1])
+	return(url)
+
+
 class AnalysisHandler(tornado.web.RequestHandler):
 	async def post(self):
 		query = self.get_argument('query')
@@ -160,9 +171,12 @@ class SearchHandler(tornado.web.RequestHandler):
 			query = get_query(articles['hits']['hits'][0]['_source'])
 			results = es.search(index="stories*", body=query)
 			stories = []
+			urls = [clean_url(query_doc['url'])]
 			for r in results['hits']['hits']:
-				if r['_score'] > 6 and r['_source']['url'] != query_doc['url']:
+				cleaned_result_url = clean_url(r['_source']['url'])
+				if r['_score'] > 6 and cleaned_result_url not in urls:
 					stories.append(create_display_dict(r))
+					urls.append(cleaned_result_url)
 			self.render(
 				'results.html',
 				query=query_doc,
@@ -222,8 +236,12 @@ class TagHandler(tornado.web.RequestHandler):
 			'actions': 'Action'
 		}
 		results = []
+		urls = []
 		for article in articles['hits']['hits']:
-			results.append(create_display_dict(article))
+			cleaned_result_url = clean_url(article['_source']['url'])
+			if cleaned_result_url not in urls:
+				results.append(create_display_dict(article))
+				urls.append(cleaned_result_url)
 		self.render(
 			'tag_search.html',
 			tag_type=display_mapping[field],
