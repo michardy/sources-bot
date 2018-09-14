@@ -20,9 +20,28 @@
 		<script type="application/ld+json">
 			{
 				"@context": "http://schema.org",
-				"@type": "WebSite",
-				"name": "Sources Bot",
-				"url": ""
+				"@type": "AboutPage",
+				"about": {
+					"@context": "http://schema.org",
+					"@type": "WebApplication",
+					"name": "Sources Bot",
+					"url": "https://sourcesbot.com"
+				},
+				"breadcrumb": {
+					"@context": "http://schema.org",
+					"@type": "BreadcrumbList",
+					"itemListElement": [{
+						"@type": "ListItem",
+						"position": 1,
+						"name": "Sourcesbot",
+						"item": "https://sourcesbot.com"
+					},{
+						"@type": "ListItem",
+						"position": 2,
+						"name": "About",
+						"item": "https://sourcesbot.com/about.html"
+					}]
+				}
 			}
 		</script>
 		<meta name="google-site-verification" content="gIHQtM45_n6R22KdZf2S9Ech18XHwLsJwbYuPoFbo1Q" />
