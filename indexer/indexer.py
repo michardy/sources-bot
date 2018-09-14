@@ -13,6 +13,16 @@ from urllib.parse import urljoin
 annotator = Annotator()
 es = Elasticsearch()
 
+def clean_url(url):
+	'''Remove the protocol, url parameters, and ID selectors'''
+	if '://' in url:
+		url = ':'.join(url.split(':')[1:])
+	if '?' in url:
+		url = '?'.join(url.split('?')[:1])
+	if '#' in url:
+		url = '#'.join(url.split('#')[:1])
+	return(url)
+
 def get_story_title(url):
 	'''Remove the little trailing bits that websites add to article titles.
 	for example:
@@ -99,17 +109,25 @@ async def create_document(index, url=None, title=None, description=None, refresh
 	})
 
 async def index_by_url(index, url, title=None, description=None, refresh=False):
+	# Check if the URL is already in the database and if so return the old object
+	# The URL needs to be matched without protocol and without arguments
+	cleaned_url = clean_url(url)
+	# In order to do this an inexact match is perfomed
 	query = {
 		"query": {
 			"match": {
-				"url.keyword": url
+				"url": cleaned_url
 			}
 		}
 	}
 	search = es.search(index="*stories*", body=query)
-	if search['hits']['total'] == 0:
+	# Because this is an inexact match we need to not only check that there are matched
+	# But also checj that the full path was matched
+	if search['hits']['total'] == 0 or cleaned_url not in search['hits']['hits'][0]['url']:
+		# There are no results or the first (and closest) match was not a complete match
 		return(await(create_document(index, url, title, description, refresh)))
 	else:
+		# There are results and the zeroth result contains the full host and path excluding protocol and parameters
 		return({
 			'index': search['hits']['hits'][0]['_index'],
 			'id': search['hits']['hits'][0]['_id']
