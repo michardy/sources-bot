@@ -7,27 +7,27 @@
 		<!--Please wait while I sacrafice a newborn goat to IE/Edge. (Edit: It still does not work)-->
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 		<!--All hail Facebook glory be their name.-->
-		<meta property="og:title" content="Sources Bot"/>
+		<meta property="og:title" content="Sources Bot Search for {{ tag }}"/>
 		<meta property="og:type" content="website"/>
-		<meta property="og:url" content=""/>
-		<meta property="og:description" content="A system to find alterate sources for news stories"/>
+		<meta property="og:url" content="https://sourcesbot.com/interactive/tag/{{ tag_field }}/{{ tag }}"/>
+		<meta property="og:description" content="Search for news stories about {{ tag }}"/>
 		<!--Birdseed (Seems a little repetative doesn't it.)-->
-		<meta name="twitter:title" content="Sources Bot"/>
+		<meta name="twitter:title" content="Sources Bot Search for {{ tag }}"/>
 		<meta name="twitter:card" content="summary"/>
-		<meta name="twitter:url" content=""/>
-		<meta name="twitter:description" content="A system to find alterate sources for news stories"/>
+		<meta name="twitter:url" content="https://sourcesbot.com/interactive/tag/{{ tag_field }}/{{ tag }}"/>
+		<meta name="twitter:description" content="Search for news stories about {{ tag }}"/>
 		<!--Google.  Meta tags are for normal companies.-->
 		<script type="application/ld+json">
 			{
 				"@context": "http://schema.org",
-				"@type": "WebSite",
-				"name": "Sources Bot",
-				"url": ""
+				"@type": "WebPage",
+				"name": "Sources Bot Search for {{ tag }}",
+				"url": "https://sourcesbot.com/interactive/tag/{{ tag_field }}/{{ tag }}"
 			}
 		</script>
 		<meta name="google-site-verification" content="gIHQtM45_n6R22KdZf2S9Ech18XHwLsJwbYuPoFbo1Q" />
 		<!--And now for the actual standard that everyone seems to need their own version of (Facebook, Twitter, Google):-->
-		<title>Sources Bot</title>
+		<title>Stories on: {{ tag }} | Sources Bot</title>
 		<meta name="description" content="A system to find alterate sources for news stories"/>
 	</head>
 	<body>
