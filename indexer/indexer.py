@@ -108,7 +108,7 @@ async def create_document(index, url=None, title=None, description=None, refresh
 		'id': res['_id']
 	})
 
-async def index_by_url(index, url, title=None, description=None, refresh=False):
+async def index_by_url(index, url, title=None, description=None, refresh=False, check_all=True):
 	# Check if the URL is already in the database and if so return the old object
 	# The URL needs to be matched without protocol and without arguments
 	cleaned_url = clean_url(url)
@@ -133,7 +133,7 @@ async def index_by_url(index, url, title=None, description=None, refresh=False):
 			'id': search['hits']['hits'][0]['_id']
 		})
 
-async def index_by_title(index, title, description=None, refresh=False):
+async def index_by_title(index, title, description=None, refresh=False, check_all=True):
 	title = title.strip(' ')
 	query = {
 		"query": {
@@ -142,7 +142,10 @@ async def index_by_title(index, title, description=None, refresh=False):
 			}
 		}
 	}
-	search = es.search(index="*stories*", body=query)
+	if check_all:
+		search = es.search(index="*stories*", body=query)
+	else:
+		search = es.search(index="stories*", body=query)
 	if search['hits']['total'] == 0:
 		return(await(create_document(index, None, title, description, refresh)))
 	else:
@@ -151,11 +154,11 @@ async def index_by_title(index, title, description=None, refresh=False):
 			'id': search['hits']['hits'][0]['_id']
 		})
 
-async def index(index, url=None, title=None, description=None, refresh=False):
+async def index(index, url=None, title=None, description=None, refresh=False, check_all=True):
 	'''Indexes an article in elasticsearch and returns an ID dictionary'''
 	if url is None and (title is None or len(title) < 2):
 		return(None)
 	if url is not None:
-		return(await(index_by_url(index, url, title, description, refresh)))
+		return(await(index_by_url(index, url, title, description, refresh, check_all)))
 	else:
-		return(await(index_by_title(index, title, description, refresh)))
+		return(await(index_by_title(index, title, description, refresh, check_all)))
