@@ -136,6 +136,7 @@ td {
 	border: 1px solid grey;
 	padding-left: 10px;
 	padding-bottom: 10px;
+	position: relative;
 }
 
 li.article {
@@ -201,4 +202,14 @@ li.article {
 	#histogram {
 		width: 96%;
 	}
+}
+
+.debug-info {
+	/* Nothing that really needs to be hidden
+	 * But the average viewer doesn't need to see it
+	 * Displayed using userstyle
+	 */
+	position: absolute;
+	right: 5px;
+	display: none;
 }

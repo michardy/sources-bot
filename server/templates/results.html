@@ -106,6 +106,7 @@
 					{% set spoiler_num = 0 %}
 					{% for result in results %}
 					<li class="article">
+						<div class="debug-info">Score: {{ result['score'] }}</div>
 						<h3><a href="{{ result['url'] }}">{{ result['title'] }}</a></h3>
 						{% if result['type'] is not None %}
 						<div>{{ result['type'] }}</div>

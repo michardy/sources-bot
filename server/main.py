@@ -120,6 +120,7 @@ def create_display_dict(hit):
 		'description',
 		'url'
 	]
+	story['score'] = hit['_score']
 	for k in keys:
 		try:
 			story[k] = hit['_source'][k]
