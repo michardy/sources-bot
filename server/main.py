@@ -335,7 +335,7 @@ class TrendingHandler(tornado.web.RequestHandler):
 				tag = {
 					'type': category,
 					'value': bucket['key'],
-					'hits': ducket['doc_count']
+					'hits': bucket['doc_count']
 				}
 				order_tag(tags, tag)
 		self.render(
