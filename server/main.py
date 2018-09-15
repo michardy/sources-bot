@@ -144,7 +144,7 @@ def order_tag(tags, tag):
 	'''Inserts tag in the correct position sorted by document hits'''
 	for i in range(len(tags)):
 		if tag['hits'] > tags[i]['hits']:
-			tags.insert(i, hit)
+			tags.insert(i, tag)
 			return(tags)
 	tags.append(tag)
 	return(tags)
