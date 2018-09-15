@@ -352,7 +352,7 @@ def make_app():
 		(r"/interactive/search/([^/]+)/([^/]+)/graph", SearchGraphHandler),
 		(r"/interactive/tag/([^/]+)/([^/]+)", TagHandler),
 		(r"/interactive/tag/([^/]+)/([^/]+)/graph", TagGraphHandler),
-		(r"interactive/embed/trending", TrendingHandler)
+		(r"/interactive/embed/trending", TrendingHandler)
 	], template_path='templates/')
 
 if __name__ == "__main__":
