@@ -61,7 +61,7 @@ main.search {
 
 footer {
 	grid-column: 1 / 5;
-	grid-row: 6;
+	grid-row: 7;
 	text-align: center;
 }
 
@@ -212,4 +212,14 @@ li.article {
 	position: absolute;
 	right: 5px;
 	display: none;
+}
+
+#trending {
+	grid-column: 1 / 5;
+	grid-row: 5;
+	width: 100%;
+}
+
+#trending-content {
+	text-align: center;
 }

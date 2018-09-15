@@ -140,6 +140,16 @@ def clean_url(url):
 	return(url)
 
 
+def order_tag(tags, tag):
+	'''Inserts tag in the correct position sorted by document hits'''
+	for i in range(len(tags)):
+		if tag['hits'] > tags[i]['hits']:
+			tags.insert(i, hit)
+			return(tags)
+	tags.append(tag)
+	return(tags)
+
+
 class AnalysisHandler(tornado.web.RequestHandler):
 	async def post(self):
 		query = self.get_argument('query')
@@ -284,13 +294,65 @@ class TagGraphHandler(tornado.web.RequestHandler):
 		self.write(graph)
 
 
+class TrendingHandler(tornado.web.RequestHandler):
+	async def get(self, field, tag):
+		query = {
+			"size": 0,
+			"query": {
+				"range": {
+					"timestamp": {
+						"gte": "now-1d"
+					}
+				}
+			},
+			"aggs": {
+				"places": {
+					"terms": {
+						"field": "places.keyword"
+					}
+				},
+				"people": {
+					"terms": {
+						"field": "people.keyword"
+					}
+				},
+				"organizations": {
+					"terms": {
+						"field": "organizations.keyword"
+					}
+				},
+				"things": {
+					"terms": {
+						"field": "things.keyword"
+					}
+				}
+			}
+		}
+		tags = []
+		response = es.search(index="stories*", body=query)
+		for category in response['aggregations']:
+			for bucket in response['aggregations'][category]['buckets']:
+				tag = {
+					'type': category,
+					'value': bucket['key'],
+					'hits': ducket['doc_count']
+				}
+				order_tag(tags, tag)
+		self.render(
+			'trending.html',
+			tags=tags
+		)
+
+
+
 def make_app():
 	return tornado.web.Application([
 		(r"/interactive/analyze", AnalysisHandler),
 		(r"/interactive/search/([^/]+)/([^/]+)", SearchHandler),
 		(r"/interactive/search/([^/]+)/([^/]+)/graph", SearchGraphHandler),
 		(r"/interactive/tag/([^/]+)/([^/]+)", TagHandler),
-		(r"/interactive/tag/([^/]+)/([^/]+)/graph", TagGraphHandler)
+		(r"/interactive/tag/([^/]+)/([^/]+)/graph", TagGraphHandler),
+		(r"interactive/embed/trending", TrendingHandler)
 	], template_path='templates/')
 
 if __name__ == "__main__":
