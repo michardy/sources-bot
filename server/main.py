@@ -295,7 +295,7 @@ class TagGraphHandler(tornado.web.RequestHandler):
 
 
 class TrendingHandler(tornado.web.RequestHandler):
-	async def get(self, field, tag):
+	async def get(self):
 		query = {
 			"size": 0,
 			"query": {
