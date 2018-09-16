@@ -115,7 +115,7 @@ async def index_by_url(index, url, title=None, description=None, refresh=False, 
 	# In order to do this an inexact match is perfomed
 	query = {
 		"query": {
-			"match": {
+			"match_phrase": {
 				"url": cleaned_url
 			}
 		}
