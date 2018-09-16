@@ -331,7 +331,11 @@ class TrendingHandler(tornado.web.RequestHandler):
 		tags = []
 		response = es.search(index="stories*", body=query)
 		for category in response['aggregations']:
+			if len(tags) == 5:
+					break
 			for bucket in response['aggregations'][category]['buckets']:
+				if len(tags) == 5:
+					break
 				tag = {
 					'type': category,
 					'value': bucket['key'],
