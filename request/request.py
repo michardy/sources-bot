@@ -28,7 +28,7 @@ class Request():
 	def __check_robots(self, url):
 		loc = urlparse(url).netloc
 		path = urlparse(url).path
-		if loc not in self._robots:
+		if loc not in self.__robots:
 			self.__robots[loc] = robotparser.RobotFileParser(
 				urljoin(loc, '/robots.txt')
 			)
