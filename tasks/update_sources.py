@@ -4,10 +4,8 @@
 import sys
 sys.path.append("..") 
 
-import datetime
-import re
+import asyncio
 from bs4 import BeautifulSoup
-from elasticsearch import Elasticsearch
 from google.cloud.language import enums
 try:
 	import urllib2
@@ -17,63 +15,12 @@ except ImportError:
 	from urllib.parse import urljoin
 
 from news import *
-from annotator.annotator import Annotator
+from indexer import indexer
 
-annotator = Annotator()
-es = Elasticsearch()
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
 
-class Source:
-	'''Generic class describing sources and how to parse them'''
-	def get(self):
-		'''Generic method to scan home pages.  Must be overriden'''
-		raise NotImplementedError("Must override update")
-
-	def _process(self, url, title, desc):
-		time = datetime.datetime.utcnow()
-		'''Gets the characteristics of  a story and saves it'''
-		query = {
-			"query": {
-				"match": {
-					"url.keyword": url
-				}
-			}
-		}
-		if es.search(index="*stories*", body=query)['hits']['total'] == 0:
-			document = {
-				'url': url,
-				'timestamp': time,
-				'title': title,
-				'description': desc,
-				'people': [],
-				'person_ids': [],
-				'places': [],
-				'place_ids': [],
-				'organizations': [],
-				'organization_ids': [],
-				'things': [],
-				'thing_ids': [],
-				'actions': [],
-				'speakers': []
-			}
-			ideas = []
-
-			# Split off '<location>:' '<speaker>:' parts
-			titles = title.split(':')
-			title = '. '.join(titles)
-
-			machine_title = annotator.annotate(title)
-			for sentence in machine_title:
-				ideas.append(sentence.get_simple_parts({}, None, False))
-				document = sentence.get_characteristics(document)
-			if desc is not None:
-				machine_desc = annotator.annotate(desc)
-				for sentence in machine_desc:
-					ideas.append(sentence.get_simple_parts({}, None, False))
-					document = sentence.get_characteristics(document)
-			document['ideas'] = ideas
-			es.index(index='<stories{now{YYYY-MM-dd}}>', body=document, doc_type='_doc')
-
-class AlJazeera(Source):
+class AlJazeera():
 	def __isolate_content(self, links):
 		for h in links:
 			desc = None
@@ -103,7 +50,15 @@ class AlJazeera(Source):
 				pass
 			if not url.startswith('http') or title == '' or title == '\n':
 				continue
-			self._process(url, title, desc)
+			doc_id = loop.run_until_complete(
+				indexer.index(
+					'stories',
+					url=url,
+					title=title,
+					description=desc,
+					check_all=False
+				)
+			)
 
 	def get(self):
 		r = urllib2.urlopen("https://www.aljazeera.com/")
@@ -112,7 +67,7 @@ class AlJazeera(Source):
 		links = soup.find_all('a')
 		self.__isolate_content(links)
 
-class Bbc(Source):
+class Bbc():
 	def __isolate_content(self, stories):
 		self._content = []
 		for s in stories:
@@ -131,17 +86,24 @@ class Bbc(Source):
 					continue
 				if url.startswith('/'):
 					url = urljoin('https://www.bbc.com/news', url)
-				self._process(url, title, desc)
+				doc_id = loop.run_until_complete(
+				indexer.index(
+						'stories',
+						url=url,
+						title=title,
+						description=desc,
+						check_all=False
+					)
+				)
 
 	def get(self):
-		self._time = datetime.datetime.utcnow()
 		r = urllib2.urlopen("https://www.bbc.com/news")
 		html = r.read()
 		soup = BeautifulSoup(html, "lxml")
 		links = soup.find_all('div', {'class':'gs-c-promo'})
 		self.__isolate_content(links)
 
-class Guardian(Source):
+class Guardian():
 	def __isolate_content(self, links):
 		self._content = []
 		for h in links:
@@ -156,17 +118,24 @@ class Guardian(Source):
 			url = h['href']
 			if url.startswith('/'):
 				url = urljoin('https://www.theguardian.com', url)
-			self._process(url, title, desc)
+			doc_id = loop.run_until_complete(
+				indexer.index(
+					'stories',
+					url=url,
+					title=title,
+					description=desc,
+					check_all=False
+				)
+			)
 
 	def get(self):
-		self._time = datetime.datetime.utcnow()
 		r = urllib2.urlopen("https://www.theguardian.com")
 		html = r.read()
 		soup = BeautifulSoup(html, "lxml")
 		links = soup.find_all('a', {'class':'js-headline-text'})
 		self.__isolate_content(links)
 
-class Hill(Source):
+class Hill():
 	def __isolate_content(self, links):
 		self._content = []
 		for h in links:
@@ -191,17 +160,24 @@ class Hill(Source):
 				continue
 			if url.startswith('/'):
 				url = urljoin('http://thehill.com/', url)
-			self._process(url, title, desc)
+			doc_id = loop.run_until_complete(
+				indexer.index(
+					'stories',
+					url=url,
+					title=title,
+					description=desc,
+					check_all=False
+				)
+			)
 
 	def get(self):
-		self._time = datetime.datetime.utcnow()
 		r = urllib2.urlopen("http://thehill.com/")
 		html = r.read()
 		soup = BeautifulSoup(html, "lxml")
 		links = soup.find_all('a')
 		self.__isolate_content(links)
 
-class Wapo(Source):
+class Wapo():
 	def __isolate_content(self, links):
 		self._content = []
 		for h in links:
@@ -217,10 +193,17 @@ class Wapo(Source):
 					desc = b[0].contents[0]
 			if url.startswith('/'):
 				url = urljoin('https://www.washingtonpost.com', url)
-			self._process(url, title, desc)
+			doc_id = loop.run_until_complete(
+				indexer.index(
+					'stories',
+					url=url,
+					title=title,
+					description=desc,
+					check_all=False
+				)
+			)
 
 	def get(self):
-		self._time = datetime.datetime.utcnow()
 		r = urllib2.urlopen("https://www.washingtonpost.com")
 		html = r.read()
 		soup = BeautifulSoup(html, "lxml")
