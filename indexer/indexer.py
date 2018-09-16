@@ -2,15 +2,14 @@ import sys
 sys.path.append("..") 
 
 from annotator.annotator import Annotator
+from request.request import Request
 
 from bs4 import BeautifulSoup
 from elasticsearch import Elasticsearch
 import datetime
-from urllib import request
-from urllib.error import *
-from urllib.parse import urljoin
 
 annotator = Annotator()
+request = Request()
 es = Elasticsearch()
 
 def clean_url(url):
@@ -30,10 +29,8 @@ def get_story_title(url):
 	becomes:
 	Andrew McCabe turned over memo on Comey firing to Mueller
 	'''
-	try:
-		with request.urlopen(url) as p:
-			html = p.read()
-	except HTTPError:
+	html = request.get(url)
+	if html is None:
 		return(None)
 	soup = BeautifulSoup(html, "lxml")
 	try:
