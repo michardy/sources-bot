@@ -30,7 +30,7 @@ class Request():
 		path = urlparse(url).path
 		if loc not in self.__robots:
 			self.__robots[loc] = robotparser.RobotFileParser(
-				urljoin(loc, '/robots.txt')
+				urljoin(url, '/robots.txt')
 			)
 			self.__robots[loc].read()
 		if time.time()-self.__robots[loc].mtime() > 60*30:
