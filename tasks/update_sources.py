@@ -6,7 +6,6 @@ sys.path.append("..")
 
 import asyncio
 from bs4 import BeautifulSoup
-from google.cloud.language import enums
 try:
 	import urllib2
 	from urlparse import urljoin
