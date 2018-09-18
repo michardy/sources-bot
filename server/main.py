@@ -6,6 +6,7 @@ from indexer import indexer
 from elasticsearch import Elasticsearch
 import tornado.ioloop
 import tornado.web
+from custom_handler import SourcesbotHandler
 
 es = Elasticsearch()
 
@@ -150,7 +151,7 @@ def order_tag(tags, tag):
 	return(tags)
 
 
-class AnalysisHandler(tornado.web.RequestHandler):
+class AnalysisHandler(SourcesbotHandler):
 	async def post(self):
 		query = self.get_argument('query')
 		if self.get_argument('type') == 'url':
@@ -167,7 +168,7 @@ class AnalysisHandler(tornado.web.RequestHandler):
 			)
 
 
-class SearchHandler(tornado.web.RequestHandler):
+class SearchHandler(SourcesbotHandler):
 	async def get(self, index, doc_id):
 		query = {
 			"query": {
@@ -199,7 +200,7 @@ class SearchHandler(tornado.web.RequestHandler):
 			self.send_error(404, reason='Story Not Found')
 
 
-class SearchGraphHandler(tornado.web.RequestHandler):
+class SearchGraphHandler(SourcesbotHandler):
 	async def get(self, index, doc_id):
 		query = {
 			"query": {
@@ -225,7 +226,7 @@ class SearchGraphHandler(tornado.web.RequestHandler):
 			self.send_error(404, reason='Story Not Found')
 
 
-class TagHandler(tornado.web.RequestHandler):
+class TagHandler(SourcesbotHandler):
 	async def get(self, field, tag):
 		if field not in ['people', 'places', 'things', 'organizations', 'actions']:
 			self.send_error(400, reason='Invalid tag field')
@@ -262,7 +263,7 @@ class TagHandler(tornado.web.RequestHandler):
 		)
 
 
-class TagGraphHandler(tornado.web.RequestHandler):
+class TagGraphHandler(SourcesbotHandler):
 	async def get(self, field, tag):
 		if field not in ['people', 'places', 'things', 'organizations', 'actions']:
 			self.send_error(400, reason='Invalid tag field')
@@ -294,7 +295,7 @@ class TagGraphHandler(tornado.web.RequestHandler):
 		self.write(graph)
 
 
-class TrendingHandler(tornado.web.RequestHandler):
+class TrendingHandler(SourcesbotHandler):
 	async def get(self):
 		query = {
 			"size": 0,
