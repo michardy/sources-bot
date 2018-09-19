@@ -231,6 +231,13 @@ class TagHandler(SourcesbotHandler):
 		if field not in ['people', 'places', 'things', 'organizations', 'actions']:
 			self.send_error(400, reason='Invalid tag field')
 		query = {
+			"sort": [
+				{
+					"timestamp": {
+						"order": "desc"
+					}
+				}
+			],
 			"query": {
 				"match": {
 					field: tag
