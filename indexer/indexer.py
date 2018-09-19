@@ -53,6 +53,7 @@ async def create_document(index, url=None, title=None, description=None, refresh
 		title = get_story_title(url)
 		if title is None:
 			return(None)
+	title = title.strip(' ')
 	document = {
 		'url': url,
 		'timestamp': datetime.datetime.utcnow(),
