@@ -43,7 +43,9 @@ class AlJazeera():
 				url = h['href']
 				if url.startswith('/topics'):
 					continue
-				if url.startswith('/'):
+				elif url.startswith('#'):
+					continue
+				elif url.startswith('/'):
 					url = urljoin('https://www.aljazeera.com/', url)
 			except KeyError: # Yes, here at Al Jazeera we use empty <a> tags!
 				pass
@@ -83,7 +85,9 @@ class Bbc():
 				url = h[0]['href']
 				if url == '/radio/player/bbc_world_service' or url == '/news/world_radio_and_tv':
 					continue
-				if url.startswith('/'):
+				elif url.startswith('#'):
+					continue
+				elif url.startswith('/'):
 					url = urljoin('https://www.bbc.com/news', url)
 				doc_id = loop.run_until_complete(
 				indexer.index(
@@ -115,7 +119,9 @@ class Guardian():
 				else:
 					title = h.contents[0].contents[0]
 			url = h['href']
-			if url.startswith('/'):
+			if url.startswith('#'):
+				continue
+			elif url.startswith('/'):
 				url = urljoin('https://www.theguardian.com', url)
 			doc_id = loop.run_until_complete(
 				indexer.index(
@@ -157,7 +163,9 @@ class Hill():
 				url = h['href']
 			except KeyError:
 				continue
-			if url.startswith('/'):
+			if url.startswith('#'):
+				continue
+			elif url.startswith('/'):
 				url = urljoin('http://thehill.com/', url)
 			doc_id = loop.run_until_complete(
 				indexer.index(
@@ -190,7 +198,9 @@ class Wapo():
 				b = h.parent.find_all({'class':'blurb'})
 				if len(b) == 1:
 					desc = b[0].contents[0]
-			if url.startswith('/'):
+			if url.startswith('#'):
+				continue
+			elif url.startswith('/'):
 				url = urljoin('https://www.washingtonpost.com', url)
 			doc_id = loop.run_until_complete(
 				indexer.index(
