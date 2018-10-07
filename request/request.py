@@ -17,13 +17,15 @@ import http.client
 # this number only needs to be 120
 http.client._MAXHEADERS = 200
 
+robotparser.URLopener.version = 'sourcesbot-crawler / 2.1 (url)'
+
 class Request():
 	def __init__(self, ua=None):
 		self.__robots = {}
 		if ua is not None:
 			self._user_agent = ua
 		else:
-			self._user_agent = "sourcesbot-crawler / 2.0 (url)"
+			self._user_agent = "sourcesbot-crawler / 2.1 (url)"
 
 	def __check_robots(self, url):
 		loc = urlparse(url).netloc
