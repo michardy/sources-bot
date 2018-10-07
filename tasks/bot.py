@@ -87,6 +87,26 @@ def get_query(document):
 				}
 			}
 			query["query"]["bool"]["should"].append(match)
+			if key == 'people':
+				match = {
+					"match": {
+						'things': {
+							"query": component,
+							"boost": boost
+						}
+					}
+				}
+				query["query"]["bool"]["should"].append(match)
+			elif key == 'things':
+				match = {
+					"match": {
+						'people': {
+							"query": component,
+							"boost": boost
+						}
+					}
+				}
+				query["query"]["bool"]["should"].append(match)
 	return(query)
 
 
