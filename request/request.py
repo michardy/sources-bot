@@ -17,8 +17,6 @@ import http.client
 # this number only needs to be 120
 http.client._MAXHEADERS = 200
 
-robotparser.URLopener.version = 'sourcesbot-crawler / 2.1 (url)'
-
 class Request():
 	def __init__(self, ua=None):
 		self.__robots = {}
