@@ -223,7 +223,10 @@ class SearchHandler(SourcesbotHandler):
 			query = get_query(articles['hits']['hits'][0]['_source'])
 			results = es.search(index="stories*", body=query)
 			stories = []
-			urls = [clean_url(query_doc['url'])]
+			try:
+				urls = [clean_url(query_doc['url'])]
+			except TypeError: # Documents without url
+				urls = []
 			for r in results['hits']['hits']:
 				cleaned_result_url = clean_url(r['_source']['url'])
 				if r['_score'] > 6 and cleaned_result_url not in urls:
