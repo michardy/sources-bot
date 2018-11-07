@@ -106,6 +106,39 @@ class Bbc():
 		links = soup.find_all('div', {'class':'gs-c-promo'})
 		self.__isolate_content(links)
 
+class Cnn():
+	def __isolate_content(self, stories):
+		self._content = []
+		for s in stories:
+			desc = None
+			title = ''
+			h = s.find_all('a')
+			t = s.find_all({'class':'cd__headline-text'})
+			if len(h) > 0:
+				url = if h[0]['href']
+			if len(t) > 0:
+				title = t[0].contents
+			if url.startswith('#'):
+				continue
+			elif url.startswith('/'):
+				url = urljoin('https://cnn.com/', url)
+			doc_id = loop.run_until_complete(
+				indexer.index(
+					'stories',
+					url=url,
+					title=title,
+					description=desc,
+					check_all=False
+				)
+			)
+
+	def get(self):
+		r = urllib2.urlopen("https://cnn.com/")
+		html = r.read()
+		soup = BeautifulSoup(html, "lxml")
+		links = soup.find_all({'class':'cd__headline'})
+		self.__isolate_content(links)
+
 class Guardian():
 	def __isolate_content(self, links):
 		self._content = []
@@ -224,6 +257,7 @@ class Wapo():
 sources = {
 	AlJazeera(),
 	Bbc(),
+	Cnn(),
 	Guardian(),
 	Hill(),
 	Wapo()
