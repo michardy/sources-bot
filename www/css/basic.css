@@ -7,19 +7,19 @@ h2, h3, h4, h5, h6 {
 }
 
 pre {
-	background-color: #eee;
+	background-color: #D5A16E;
 }
 
 table {
-	border: 1px solid black;
+	border: 1px solid #712E32;
 }
 
 td {
-	border: 1px solid black;
+	border: 1px solid #712E32;
 }
 
 .article {
-	border: 1px solid grey;
+	border: 1px solid #D5A16E;
 	padding-left: 10px;
 	padding-bottom: 10px;
 	position: relative;
@@ -64,8 +64,8 @@ li.article {
 
 .taglist li a {
 	text-decoration: none;
-	border: 1px solid lightgray;
-	background-color: lightblue;
+	border: 1px solid #D5A16E;
+	background-color: #EF8A20;
 	line-height: 40px;
 	margin: 5px;
 	padding: 5px;
@@ -83,4 +83,8 @@ li.article {
 
 #trending-content {
 	text-align: center;
+}
+
+a {
+	color: #EF8A20;
 }

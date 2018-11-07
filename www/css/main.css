@@ -4,16 +4,21 @@ body {
 	width:100%;
 	grid-template-columns: repeat(4, 24.7%);
 	grid-auto-rows: minmax(100px, auto);
+	background-color: #EFE9D0;
+	color: #712E32;
 }
 
 header {
-	grid-column: 1 / 4;
+	grid-column: 1 / 5;
 	grid-row: 1;
 	padding-bottom:15px;
+	padding-left: 1%;
+	background-color: #712E32;
 }
 
 header h1 a {
 	text-decoration:none;
+	color: #EF8A20;
 }
 
 @media (min-aspect-ratio: 4/3) {
@@ -63,10 +68,12 @@ footer {
 	grid-column: 1 / 5;
 	grid-row: 7;
 	text-align: center;
+	color: #A56356;
 }
 
 .navbar {
 	display:inline;
+	color: #EFE9D0;
 }
 
 .fatradio-button {
@@ -78,10 +85,11 @@ footer {
 
 .fatradio-button+label {
 	border: 1px solid black;
-	background-color: lightblue;
+	background-color: #A56356;
 	padding-left: 5px;
 	padding-right: 5px;
 	white-space: nowrap;
+	color: #EFE9D0;
 }
 
 #tabbar {
@@ -90,31 +98,43 @@ footer {
 }
 
 .fatradio-button:checked+label {
-	border-top: 1px solid black;
-	border-left: 1px solid black;
-	border-right: 1px solid black;
-	border-bottom: 1px solid white;
-	background-color: white;
+	border-top: 1px solid #712E32;
+	border-left: 1px solid #712E32;
+	border-right: 1px solid #712E32;
+	border-bottom: 1px solid #D5A16E;
+	background-color: #D5A16E;
 }
 
 #searcharea {
 	padding-top: 5px;
 	padding-bottom: 5px;
-	border: 1px solid black;
+	border: 1px solid #712E32;
 	z-index: 1;
+	background-color: #D5A16E;
+}
+
+#searcharea button {
+	background-color: #EF8A20;
+	border: none;
+	padding: 1%;
 }
 
 #searchbox {
 	width: 75%;
+	background-color: #EFE9D0;
+	border: 1px solid #D5A16E;
+	padding: 1%;
+	color: #712E32;
 }
 
 .taglist li a {
 	text-decoration: none;
-	border: 1px solid lightgray;
-	background-color: lightblue;
+	border: 1px solid #D5A16E;
+	background-color: #EF8A20;
 	line-height: 40px;
 	margin: 5px;
 	padding: 5px;
+	color: #EFE9D0;
 }
 
 #histogram {
