@@ -115,7 +115,7 @@ class Cnn():
 			h = s.find_all('a')
 			t = s.find_all({'class':'cd__headline-text'})
 			if len(h) > 0:
-				url = if h[0]['href']
+				url = h[0]['href']
 			if len(t) > 0:
 				title = t[0].contents
 			if url.startswith('#'):
