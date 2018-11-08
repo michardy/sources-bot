@@ -217,6 +217,47 @@ class Hill():
 		links = soup.find_all('a')
 		self.__isolate_content(links)
 
+class Nyt():
+	def __isolate_content(self, stories):
+		self._content = []
+		for s in stories:
+			desc = None
+			title = ''
+			url = ''
+			links = s.find_all('a')
+			titles = s.find_all({'class':'esl82me2'})
+			descriptions = s.find_all({'class':'e1n8kpyg0'})
+			bulletpoints = s.find_all({'class':'e1n8kpyg1'})
+			if len(links) > 0:
+				url = links[0]['href']
+			if len(titles) > 0:
+				title = titles[0].contents
+			if len(descriptions) > 0:
+				desc = descriptions[0].contents
+			elif len(bulletpoints) > 0:
+				for b in bulletpoints[0]:
+					desc += b.contents
+			if url.startswith('#'):
+				continue
+			elif url.startswith('/'):
+				url = urljoin('https://nytimes.com/', url)
+			doc_id = loop.run_until_complete(
+				indexer.index(
+					'stories',
+					url=url,
+					title=title,
+					description=desc,
+					check_all=False
+				)
+			)
+
+	def get(self):
+		r = urllib2.urlopen("https://nytimes.com/")
+		html = r.read()
+		soup = BeautifulSoup(html, "lxml")
+		links = soup.find_all({'class':'assetWrapper'})
+		self.__isolate_content(links)
+
 class Wapo():
 	def __isolate_content(self, links):
 		self._content = []
@@ -260,6 +301,7 @@ sources = {
 	Cnn(),
 	Guardian(),
 	Hill(),
+	Nyt(),
 	Wapo()
 }
 
