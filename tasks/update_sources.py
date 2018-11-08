@@ -298,7 +298,7 @@ class Wapo():
 sources = {
 	AlJazeera(),
 	Bbc(),
-	Cnn(),
+	#Cnn(),
 	Guardian(),
 	Hill(),
 	Nyt(),
