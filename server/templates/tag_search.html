@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8"/>
+		<meta id="meta" name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="/css/main.css"/>
+		<link rel="stylesheet" href="/css/basic.css"/>
+		<!--Please wait while I sacrafice a newborn goat to IE/Edge. (Edit: It still does not work)-->
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+		<!--All hail Facebook glory be their name.-->
+		<meta property="og:title" content="Sources Bot Search for {{ tag }}"/>
+		<meta property="og:type" content="website"/>
+		<meta property="og:url" content="https://sourcesbot.com/interactive/tag/{{ tag_field }}/{{ tag }}"/>
+		<meta property="og:description" content="Search for news stories about {{ tag }}"/>
+		<!--Birdseed (Seems a little repetative doesn't it.)-->
+		<meta name="twitter:title" content="Sources Bot Search for {{ tag }}"/>
+		<meta name="twitter:card" content="summary"/>
+		<meta name="twitter:url" content="https://sourcesbot.com/interactive/tag/{{ tag_field }}/{{ tag }}"/>
+		<meta name="twitter:description" content="Search for news stories about {{ tag }}"/>
+		<!--Google.  Meta tags are for normal companies.-->
+		<script type="application/ld+json">
+			{
+				"@context": "http://schema.org",
+				"@type": "WebPage",
+				"name": "Sources Bot Search for {{ tag }}",
+				"url": "https://sourcesbot.com/interactive/tag/{{ tag_field }}/{{ tag }}"
+			}
+		</script>
+		<meta name="google-site-verification" content="gIHQtM45_n6R22KdZf2S9Ech18XHwLsJwbYuPoFbo1Q" />
+		<!--And now for the actual standard that everyone seems to need their own version of (Facebook, Twitter, Google):-->
+		<title>Stories on: {{ tag }} | Sources Bot</title>
+		<meta name="description" content="A system to find alterate sources for news stories"/>
+	</head>
+	<body>
+		<header>
+			<h1><a href="/">Sources Bot</a></h1>
+			<a class="navbar" href="/about.html">About</a>&nbsp;
+			<a class="navbar" href="https://github.com/michardy/sources-bot">Code</a>&nbsp;
+			<a class="navbar" href="https://reddit.com/r/sourcesbot">Subreddit</a>&nbsp;
+			<a class="navbar" href="https://reddit.com/u/sourcesbot">Reddit Bot</a>&nbsp;
+		</header>
+		<div id="histogram" title="{{ tag }} over time"></div>
+		<main class="results">
+			<h2>{{ tag_type }}: {{ tag }}</h2>
+			<output>
+				<ul>
+					{% set spoiler_num = 0 %}
+					{% for result in results %}
+					<li class="article">
+						<div class="debug-info">Score: {{ result['score'] }}</div>
+						<h3><a href="{{ result['url'] }}">{{ result['title'] }}</a></h3>
+						{% if result['type'] is not None %}
+						<div>{{ result['type'] }}</div>
+						{% end %}
+						{% if result['description'] is not None %}
+						<div>{{ result['description'] }}</div>
+						{% end %}
+						<div class="spoiler">
+							<input class="spoiler-button" type="checkbox" id="content{{ spoiler_num }}spoiler"/>
+							<label for="content{{ spoiler_num }}spoiler"><h3 class="spoiler-title">Match Terms</h3></label>
+							<div class="spoiler-content">
+								<h5>People:</h5>
+								<ul class="taglist">
+									{% for person in result['people'] %}
+									<li>
+										<a href="/interactive/tag/people/{{ person }}">{{ person }}</a>
+									</li>
+									{% end %}
+								</ul>
+								<h5>Places:</h5>
+								<ul class="taglist">
+									{% for place in result['places'] %}
+									<li>
+										<a href="/interactive/tag/places/{{ place }}">{{ place }}</a>
+									</li>
+									{% end %}
+								</ul>
+								<h5>Organizations:</h5>
+								<ul class="taglist">
+									{% for organization in result['organizations'] %}
+									<li>
+										<a href="/interactive/tag/organizations/{{ organization }}">{{ organization }}</a>
+									</li>
+									{% end %}
+								</ul>
+								<h5>Things:</h5>
+								<ul class="taglist">
+									{% for thing in result['things'] %}
+									<li>
+										<a href="/interactive/tag/things/{{ thing }}">{{ thing }}</a>
+									</li>
+									{% end %}
+								</ul>
+								<h5>Actions:</h5>
+								<ul class="taglist">
+									{% for action in result['actions'] %}
+									<li>
+										<a href="/interactive/tag/actions/{{ action }}">{{ action }}</a>
+									</li>
+									{% end %}
+								</ul>
+							</div>
+						</div>
+					</li>
+					{% set spoiler_num += 1 %}
+					{% end %}
+				</ul>
+			</output>
+		</main>
+		<footer>
+			<div>
+				&copy; 2018 Michael Hardy
+			</div>
+			<div>
+				Graphs rendered with <a href="https://plot.ly/javascript/">plotly.js</a>
+			</div>
+		</footer>
+		<!--Graphing-->
+		<script src="https://cdn.plot.ly/plotly-1.41.0.min.js"></script>
+		<script>
+			fetch('/interactive/tag/{{ tag_field }}/{{ tag }}/graph')
+				.then(function(response) {
+					return response.json();
+				})
+				.then(function(data){
+					var layout = {
+						showlegend: false,
+						margin: {
+							l: 50,
+							r: 50,
+							b: 50,
+							t: 50,
+							pad: 4
+						},
+						yaxis: {
+							title: 'Number of Articles'
+						}
+					};
+					Plotly.newPlot('histogram', [data], layout, {staticPlot: true});
+				})
+		</script>
+	</body>
+</html>

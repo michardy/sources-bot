@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<meta id="meta" name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="/css/basic.css"/>
+		<!--Please wait while I sacrafice a newborn goat to IE/Edge. (Edit: It still does not work)-->
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+		<title>Trending</title>
+		<base target="_parent">
+	</head>
+	<body id="trending-content">
+		<h3>Trending:</h3>
+		<ul class="taglist">
+			{% for tag in tags %}
+			<li>
+				<a href="/interactive/tag/{{ tag['type'] }}/{{ tag['value'] }}">{{ tag['value'] }}</a>
+			</li>
+			{% end %}
+		</ul>
+	</body>
+</html>
