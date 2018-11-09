@@ -1,0 +1,44 @@
+/* Default branding
+ * Edit this file to change colors and their use
+ */
+
+:root {
+	/* Define the colors used */
+	--dark: #712E32;
+	--light: #EFE9D0;
+	--emphasis: #EF8A20;
+	--mid-light: #D5A16E;
+	--mid-dark: #A56356;
+
+	/* define usages of colors */
+	--background: var(--light);
+	--text: var(--dark);
+	--header: var(--mid-dark);
+	--title: var(--emphasis);
+	--header-text: var(--light);
+	--footer-text: var(--mid-dark);
+	--subtle-card: var(--mid-light);
+	--blatant-card: var(--mid-dark);
+	--pane: var(--mid-light);
+	--pane-border: var(--dark);
+	--pane-text: var(--dark);
+	--tab-deselected: var(--mid-dark);
+	--tab-deselected-text: var(--light);
+	--table: var(--light);
+	--table-border: var(--dark);
+	--link: var(--mid-dark);
+	--link-visited: var(--mid-light);
+	--tag: var(--emphasis);
+	--tag-border: var(--mid-light);
+	--tag-text: var(--light);
+	--button: var(--mid-light);
+	--button-text: var(--light);
+	--button-major: var(--emphasis);
+	--button-major-text: var(--light);
+	--button-minor: var(--mid-light);
+	--button-major-text: var(--dark);
+}
+
+header h1 {
+	font-family: monospace
+}

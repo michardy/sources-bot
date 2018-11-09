@@ -1,77 +1,3 @@
-h1 {
-	font-family: monospace;
-}
-
-h2, h3, h4, h5, h6 {
-	font-family:sans-serif;
-}
-
-pre {
-	background-color: #D5A16E;
-}
-
-table {
-	border: 1px solid #712E32;
-}
-
-td {
-	border: 1px solid #712E32;
-}
-
-.article {
-	border: 1px solid #D5A16E;
-	padding-left: 10px;
-	padding-bottom: 10px;
-	position: relative;
-}
-
-li.article {
-	list-style-type: none;
-}
-
-.spoiler-content {
-	display: none;
-}
-
-.spoiler-title{
-	cursor: pointer;
-}
-
-.spoiler-title::before {
-	content: "▶ ";
-}
-
-.spoiler-button:checked+label .spoiler-title::before {
-	content: "▼ ";
-}
-
-.spoiler-button:checked+label+div {
-	display: block;
-}
-
-.spoiler-button {
-	display: none;
-}
-
-.taglist {
-	margin-left: -40px;
-}
-
-.taglist li {
-	list-style-type: none;
-	display: inline-block;
-}
-
-.taglist li a {
-	text-decoration: none;
-	border: 1px solid #D5A16E;
-	background-color: #EF8A20;
-	line-height: 40px;
-	margin: 5px;
-	padding: 5px;
-	color: #EFE9D0;
-}
-
 .debug-info {
 	/* Nothing that really needs to be hidden
 	 * But the average viewer doesn't need to see it
@@ -84,8 +10,4 @@ li.article {
 
 #trending-content {
 	text-align: center;
-}
-
-a {
-	color: #EF8A20;
 }

@@ -3,7 +3,9 @@
 	<head>
 		<meta charset="utf-8"/>
 		<meta id="meta" name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" href="css/main.css"/>
+		<link rel="stylesheet" href="css/branding.css"/>
+		<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/michardy/grid-ui@v1.0.1-beta/css/grid_window.css">
+		<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/michardy/grid-ui@v1.0.1-beta/css/basic.css">
 		<link rel="stylesheet" href="css/basic.css"/>
 		<!--Please wait while I sacrafice a newborn goat to IE/Edge. (Edit: It still does not work)-->
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
@@ -48,6 +50,14 @@
 			}
 		</script>
 		<meta name="google-site-verification" content="gIHQtM45_n6R22KdZf2S9Ech18XHwLsJwbYuPoFbo1Q" />
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-125118373-1"></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+
+			gtag('config', 'UA-125118373-1');
+		</script>
 		<!--And now for the actual standard that everyone seems to need their own version of (Facebook, Twitter, Google):-->
 		<title>About | Sources Bot</title>
 		<meta name="description" content="A system to find alterate sources for news stories"/>
@@ -59,8 +69,9 @@
 			<a class="navbar" href="https://github.com/michardy/sources-bot">Code</a>&nbsp;
 			<a class="navbar" href="https://reddit.com/r/sourcesbot">Subreddit</a>&nbsp;
 			<a class="navbar" href="https://reddit.com/u/sourcesbot">Reddit Bot</a>&nbsp;
+			<a class="navbar" href="/privacy.html">Privacy</a>&nbsp;
 		</header>
-		<main class="text">
+		<main class="article-page">
 			<h2>About</h2>
 			<article>
 				Sources Bot is a peice of software built to find similar news articles across a variety of sources.
@@ -68,17 +79,51 @@
 			</article>
 			<h2>How it Works</h2>
 			<article>
-				Sources Bot works by tagging nouns and verbs in article titles and descriptions and searching for siminalr documents across a database of tagged articles.
+				<p>Sources Bot works by tagging nouns and verbs in article titles and descriptions and searching for similar documents across a database of tagged articles.</p>
+				<p>
+					For example the BBC ran a story titled: &quot;Mexico police sent to meet migrant caravan&quot; with the subtitle: &quot;The move follows President Trump's threat to close the US-Mexico border and cut aid.&quot;
+					This story then got tagged for organizations, people, places, things, and actions resulting in the following output:
+					</p>
+					<pre class="subtle-card">
+{
+  "actions": [
+    "send",
+    "meet",
+    "follow",
+    "close",
+    "cut"
+  ],
+  "organizations": [],
+  "places": [
+    "US Mexico border"
+  ],
+  "people": [
+    "Mexico police",
+    "Trump",
+    "President"
+  ],
+  "things": [
+    "caravan",
+    "move",
+    "threat",
+    "aid"
+  ]
+}
+</pre>
+				<p>The system then searches for other documents with these tags and the <a href="https://sourcesbot.com/interactive/search/stories2018-10-19/AhyyimYB7oEvxnSxrGHQ">results</a> are returned.</p>
 			</article>
 			<h2>Caviats</h2>
 			<article>
+				<h3>Small Database</h3>
+				This system could do with more data from a wider variety of sources.
+				As of this writing it only contains 14,818 stories spread accross less than 60 days.  
 				<h3>The Importance of Fact</h3>
 				While understanding different political opinions is increasingly important in today's political climate, so are responsible reporting and factual accuracy.
 				This means not only ensuring the factual accuracy of news articles but also in some cases opinion peices.
 				In order to ensure I am responsibly desseminating information I will not promote or suggest sources that:
 				<ul>
 					<li>Promote or sanction acts of violence</li>
-					<li>Question the science on Climate Change or Vaccines</li>
+					<li>Question the science on Climate Change or vaccines</li>
 					<li>Knowingfully tell demonstrable untruths</li>
 				</ul>
 				As a side effect of this Sources Bot does not suggest the following news sources:

@@ -3,8 +3,11 @@
 	<head>
 		<meta charset="utf-8"/>
 		<meta id="meta" name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" href="css/main.css"/>
+		<link rel="stylesheet" href="css/branding.css"/>
+		<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/michardy/grid-ui@v1.0.1-beta/css/grid_window.css">
+		<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/michardy/grid-ui@v1.0.1-beta/css/basic.css">
 		<link rel="stylesheet" href="css/basic.css"/>
+		<link rel="stylesheet" href="css/landing.css"/>
 		<!--Please wait while I sacrafice a newborn goat to IE/Edge. (Edit: It still does not work)-->
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 		<!--All hail Facebook glory be their name.-->
@@ -44,16 +47,16 @@
 		<main class="search">
 			<h2>Find Similar Articles:</h2>
 			<form id="searchform" action="/interactive/analyze" method="POST">
-				<div id="tabbar">
+				<div class="tabbar">
 					<span>Search by:</span>
 					<input onclick="update_search(this);" id="urlselector" class="fatradio-button" type="radio" name="type" value="url" checked/>
 					<label for="urlselector">article url</label>
 					<input onclick="update_search(this);" id ="titleselector" class="fatradio-button" type="radio" name="type" value="title"/>
 					<label for="titleselector">article title</label>
 				</div>
-				<div id="searcharea">
+				<div class="pane">
 					<input id="searchbox" type="text" placeholder="URL or article title" name="query"/>
-					<button>Search</button>
+					<button class="button-major">Search</button>
 				</div>
 			</form>
 		</main>
