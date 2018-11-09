@@ -4,8 +4,8 @@
 		<meta charset="utf-8"/>
 		<meta id="meta" name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="stylesheet" href="css/branding.css"/>
-		<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/michardy/grid-ui@v1.0.1-beta/css/grid_window.css">
-		<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/michardy/grid-ui@v1.0.1-beta/css/basic.css">
+		<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/michardy/grid-ui@v2.0.0-alpha/css/grid_window.css">
+		<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/michardy/grid-ui@v2.0.0-alpha/css/basic.css">
 		<link rel="stylesheet" href="css/basic.css"/>
 		<!--Please wait while I sacrafice a newborn goat to IE/Edge. (Edit: It still does not work)-->
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
@@ -33,7 +33,7 @@
 		<title>Results for: {{ query['title'] }} | Sources Bot</title>
 		<meta name="description" content="Similar news stories for: {{ query['title'] }}"/>
 	</head>
-	<body>
+	<body class="search-results-page">
 		<header>
 			<h1><a href="/">Sources Bot</a></h1>
 			<a class="navbar" href="/about.html">About</a>&nbsp;
@@ -42,8 +42,8 @@
 			<a class="navbar" href="https://reddit.com/u/sourcesbot">Reddit Bot</a>&nbsp;
 		</header>
 		<div id="histogram" title="Matches for this story over time"></div>
-		<main class="search-results-page">
-			<div class="subtle-card">
+		<main>
+			<div class="card subtle-card">
 				<h2>
 					{% if query['url'] is not None %}
 					<a href="{{ query['url'] }}">{{ query['title'] }}</a>
@@ -108,7 +108,7 @@
 				<ul>
 					{% set spoiler_num = 0 %}
 					{% for result in results %}
-					<li class="subtle-card">
+					<li class="card subtle-card">
 						<div class="debug-info">Score: {{ result['score'] }}</div>
 						<h3><a href="{{ result['url'] }}">{{ result['title'] }}</a></h3>
 						{% if result['type'] is not None %}

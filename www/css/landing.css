@@ -1,4 +1,4 @@
-main.search {
+.search main {
 	position: relative;
 	grid-column: 1 / 5;
 	grid-row: 3;
@@ -30,4 +30,8 @@ main.search {
 	grid-row: 5;
 	width: 100%;
 	border: none;
+}
+
+.search footer {
+	grid-row: 7;
 }
