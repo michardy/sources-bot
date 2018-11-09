@@ -239,6 +239,8 @@ class Nyt():
 					desc += b.contents
 			if url.startswith('#'):
 				continue
+			elif url == '':
+				continue
 			elif url.startswith('/'):
 				url = urljoin('https://nytimes.com/', url)
 			doc_id = loop.run_until_complete(
@@ -255,7 +257,7 @@ class Nyt():
 		r = urllib2.urlopen("https://nytimes.com/")
 		html = r.read()
 		soup = BeautifulSoup(html, "lxml")
-		links = soup.find_all({'class':'assetWrapper'})
+		links = soup.find_all('div', {'class':'assetWrapper'})
 		self.__isolate_content(links)
 
 class Wapo():
