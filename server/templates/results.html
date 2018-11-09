@@ -43,7 +43,7 @@
 		</header>
 		<div id="histogram" title="Matches for this story over time"></div>
 		<main class="results">
-			<div class="article">
+			<div class="subtle-card">
 				<h2>
 					{% if query['url'] is not None %}
 					<a href="{{ query['url'] }}">{{ query['title'] }}</a>
@@ -108,7 +108,7 @@
 				<ul>
 					{% set spoiler_num = 0 %}
 					{% for result in results %}
-					<li class="article">
+					<li class="subtle-card">
 						<div class="debug-info">Score: {{ result['score'] }}</div>
 						<h3><a href="{{ result['url'] }}">{{ result['title'] }}</a></h3>
 						{% if result['type'] is not None %}
