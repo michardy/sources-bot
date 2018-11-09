@@ -1,9 +1,6 @@
 # sources-bot
 Bot that identifies other sources of news for a story.  
 
-## Current Development Branch
-The current development branch is [split_components](https://github.com/michardy/sources-bot/tree/split_components).  This is also the code powering /u/sourcesbot on reddit and https://sourcesbot.com
-
 ## How it works
 
 1. Current news sites are queried for current articles. (This is information is periodically refreshed as it goes out of date.)
