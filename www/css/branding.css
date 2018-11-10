@@ -13,7 +13,7 @@
 	/* define usages of colors */
 	--background: var(--light);
 	--text: var(--dark);
-	--header: var(--mid-dark);
+	--header: var(--dark);
 	--title: var(--emphasis);
 	--header-text: var(--light);
 	--footer-text: var(--mid-dark);
@@ -36,7 +36,7 @@
 	--button-major: var(--emphasis);
 	--button-major-text: var(--light);
 	--button-minor: var(--mid-light);
-	--button-major-text: var(--dark);
+	--button-minor-text: var(--dark);
 }
 
 header h1 {
