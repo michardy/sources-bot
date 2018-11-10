@@ -260,6 +260,45 @@ class Nyt():
 		links = soup.find_all('div', {'class':'assetWrapper'})
 		self.__isolate_content(links)
 
+class Spiegel():
+	def __isolate_content(self, stories):
+		self._content = []
+		for s in stories:
+			desc = None
+			title = ''
+			url = ''
+			links = s.find_all('a', {'class':'article-icon'})
+			titles = s.find_all({'class':'headline'})
+			descriptions = s.find_all({'class':'article-intro'})
+			if len(links) > 0:
+				url = links[0]['href']
+			if len(titles) > 0:
+				title = titles[0].contents
+			if len(descriptions) > 0:
+				desc = descriptions[0].find(text=True, recursive=False)
+			if url.startswith('#'):
+				continue
+			elif url == '':
+				continue
+			elif url.startswith('/'):
+				url = urljoin('http://www.spiegel.de/international/', url)
+			doc_id = loop.run_until_complete(
+				indexer.index(
+					'stories',
+					url=url,
+					title=title,
+					description=desc,
+					check_all=False
+				)
+			)
+
+	def get(self):
+		r = urllib2.urlopen("http://www.spiegel.de/international/")
+		html = r.read()
+		soup = BeautifulSoup(html, "lxml")
+		links = soup.find_all('div', {'class':'teaser'})
+		self.__isolate_content(links)
+
 class Wapo():
 	def __isolate_content(self, links):
 		self._content = []
@@ -304,6 +343,7 @@ sources = {
 	Guardian(),
 	Hill(),
 	Nyt(),
+	Spiegel(),
 	Wapo()
 }
 
