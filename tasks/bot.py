@@ -143,6 +143,8 @@ def clean_url(url):
 		url = '?'.join(url.split('?')[:1])
 	if '#' in url:
 		url = '#'.join(url.split('#')[:1])
+	if url.startswith('//www.'):
+		url = '//'+'.'.join(url.split('.')[1:])
 	return(url)
 
 loop = asyncio.new_event_loop()
