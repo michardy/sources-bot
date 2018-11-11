@@ -37,10 +37,12 @@ def get_story_title(url):
 		title = soup.find_all('title')[0].contents[0]
 	except IndexError: # untitled site
 		title = ''
-	if '|' in title:
-		title = title.split('|')[0]
-	elif ' - ' in title:
+	if title.startswith('Opinion |') and len(title) > 9:
+		title = title.split('|')[1]
+	if ' - ' in title:
 		title = title.split(' - ')[0]
+	elif '|' in title:
+		title = title.split('|')[0]
 	elif '«' in title:
 		title = title.split('«')[0]
 	title = title.strip(' ')
