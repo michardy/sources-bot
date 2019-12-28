@@ -126,7 +126,7 @@ async def index_by_url(index, url, title=None, description=None, refresh=False, 
 		search = es.search(index="stories*", body=query)
 	# Because this is an inexact match we need to not only check that there are matched
 	# But also checj that the full path was matched
-	if search['hits']['total'] == 0 or cleaned_url not in search['hits']['hits'][0]['_source']['url']:
+	if search['hits']['total']['value'] == 0 or cleaned_url not in search['hits']['hits'][0]['_source']['url']:
 		# There are no results or the first (and closest) match was not a complete match
 		return(await(create_document(index, url, title, description, refresh)))
 	else:
