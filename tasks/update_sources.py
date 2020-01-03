@@ -39,6 +39,8 @@ class AlJazeera():
 						title = h.contents[0].contents[0].contents[0]
 			except IndexError: # malformed HTML
 				pass
+			except TypeError:
+				pass
 			try:
 				url = h['href']
 				if url.startswith('/topics'):
